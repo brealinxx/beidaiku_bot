@@ -2,10 +2,8 @@ import requests
 from os import environ
 from telebot import TeleBot
 from telebot.types import Message
-import json
 
-#OPENAI_GPT_3_5_KEY = environ.get("GOOGLE_GEMINI_KEY")
-gpt3_5_key = ''
+openAI_3d5_key = environ.get("OPENAI_3d5_KEY")
 
 def gpt3_5_handler(message: Message, bot: TeleBot) -> None:  
     """OpenAI : /gpt3.5 <question>"""
@@ -15,14 +13,10 @@ def gpt3_5_handler(message: Message, bot: TeleBot) -> None:
         "Generating OpenAI GPT3.5 answer please wait, note, will only keep the last five messages:",
     )
     m = message.text.strip()
-    # data = {
-    #     "prompt": {
-    #         "text": f"{m}"
-    #     }
-    # }
+
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {gpt3_5_key}"
+        "Authorization": f"Bearer {openAI_3d5_key}"
     }
     data = {
         "model": "gpt-3.5-turbo",
