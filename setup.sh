@@ -10,22 +10,6 @@ openAI_GPT3d5_key="${OPENAI_GPT3d5_KEY}"
 google_gemini_api_key="${Google_Gemini_API_Key}"
 telegram_bot_token="${Telegram_Bot_Token}"
 
-if [ -n "$Python_Venv_Path" ]; then
-    venv_dir="${Python_Venv_Path}"
-fi
-
-if [ -n "$Python_Bin_Path" ]; then
-    python_bin_path="$Python_Bin_Path"
-fi
-
-if [ -n "$Python_Venv_Path" ]; then
-    venv_dir="${Python_Venv_Path}"
-fi
-
-if [ -n "$Python_Bin_Path" ]; then
-    python_bin_path="$Python_Bin_Path"
-fi
-
 sudoCmd=""
 if [[ $(/usr/bin/id -u) -ne 0 ]]; then
   sudoCmd="sudo"
@@ -38,12 +22,15 @@ if [ -d "$venv_dir" ]; then
 fi
 
 # created virtual environment
-$python_bin_path -m venv "$venv_dir"
+$python_bin_path -m venv venv
 if [ $? -eq 0 ]; then
   echo "Successfully created virtual environment."
 else
   echo "Failed to create virtual environment."
 fi
+
+venv_dir="${project_path}/venv"
+python_bin_path="${venv_dir}/bin"
 
 source $venv_dir/bin/activate
 python3 -m pip install --upgrade pip
