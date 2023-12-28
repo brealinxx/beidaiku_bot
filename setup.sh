@@ -22,14 +22,14 @@ if [ -d "$venv_dir" ]; then
 fi
 
 # created virtual environment
-$python_bin_path -m venv venv
+$python_bin_path -m venv .venv
 if [ $? -eq 0 ]; then
   echo "Successfully created virtual environment."
 else
   echo "Failed to create virtual environment."
 fi
 
-venv_dir="${project_path}/venv"
+venv_dir="${project_path}/.venv"
 python_bin_path="${venv_dir}/bin"
 
 source $venv_dir/bin/activate

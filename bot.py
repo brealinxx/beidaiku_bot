@@ -14,7 +14,7 @@ TELEGRAM_API_KEY = environ.get("Telegram_Bot_Token")
 TELEGRAM_API_KEY = ''
 GOOGLE_GEMINI_KEY = environ.get("Google_Gemini_API_Key")
 
-bot = telebot.TeleBot(TELEGRAM_API_KEY)
+#bot = telebot.TeleBot(TELEGRAM_API_KEY)
 
 genai.configure(api_key=GOOGLE_GEMINI_KEY)
 generation_config = {
