@@ -46,7 +46,7 @@ else
 fi
 
 source $venv_dir/bin/activate
-python -m pip install --upgrade pip
+python3 -m pip install --upgrade pip
 pip install -r requirements.txt
 
 osSystemMdPath="/lib/systemd/system/"
