@@ -86,7 +86,7 @@ function installPythonVirtualEnv(){
     if [ -d "$venv_dir" ]; then
         echo "Virtual Environment already exist"
         if [ -z "$1" ]; then
-            exit 1
+            echo "install [Unit]"
         else
             source $venv_dir/bin/activate
         fi
