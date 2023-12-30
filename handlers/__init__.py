@@ -43,9 +43,8 @@ def wrap_handler(handler: T, bot: TeleBot) -> T:
                 m = message.caption = extract_prompt(
                     message.caption, bot.get_me().username
                 )
-            if not m:
-                bot.reply_to(message, "Please provide info after start words.")
-                return
+            # if not m:
+            #     bot.reply_to(message, "If an unexpected error occurs, please type some words after command.")
             return handler(message, *args, **kwargs)
         except Exception:
             traceback.print_exc()
