@@ -163,3 +163,4 @@ cython_debug/
 OUT_FOLDER/
 cache/
 nohup.out
+.DS_Store
