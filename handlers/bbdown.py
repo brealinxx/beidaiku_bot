@@ -11,14 +11,14 @@ def BBDown(message: Message, bot: TeleBot) -> None:
      """BBDown : /bbdown <bilibili URL>"""
      url = message.text
      print(url)
-     folder = os.listdir("~/videos")
+     download_path = os.path.expanduser("~/videos")
 
-     output, error = DownloadBBDVideo(url, folder)
+     output, error = DownloadBBDVideo(url, download_path)
      if error:
         bot.reply_to(message, f"下载错误: {error}")
         return
      
-     video_folder = f"~/videos/{GetVideoID(url)}" 
+     video_folder = f"{download_path}/{GetVideoID(url)}" 
 
      try: 
           files = os.listdir(video_folder)
@@ -37,7 +37,7 @@ def BBDown(message: Message, bot: TeleBot) -> None:
         bot.delete_message(message.chat.id, message.message_id)
 
 def DownloadBBDVideo(url, download_path):
-    process = subprocess.Popen(['BBDown', '--work-dir', download_path, url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(['/root/DEV/BBDown', '--work-dir', download_path, url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = process.communicate()
     if process.returncode != 0:
         return None, error.decode('utf-8')
