@@ -44,8 +44,7 @@ def wrap_handler(handler: T, bot: TeleBot) -> T:
                     message.caption, bot.get_me().username
                 )
             elif message.entities and any(entity.type == "url" for entity in message.entities):
-                url = message.entities[0].url  
-                m = url  
+                m = message.entities[0].url  
             else:
                 bot.reply_to(message, "Please provide some text or a URL.")
                 return
