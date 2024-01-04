@@ -43,6 +43,12 @@ def wrap_handler(handler: T, bot: TeleBot) -> T:
                 m = message.caption = extract_prompt(
                     message.caption, bot.get_me().username
                 )
+            elif message.entities and any(entity.type == "url" for entity in message.entities):
+                url = message.entities[0].url  
+                m = url  
+            else:
+                bot.reply_to(message, "Please provide some text or a URL.")
+                return
             # if not m:
             #     bot.reply_to(message, "If an unexpected error occurs, please type some words after command.")
             return handler(message, *args, **kwargs)
