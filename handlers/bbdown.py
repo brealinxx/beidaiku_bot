@@ -8,9 +8,11 @@ import re
 import asyncio
 
 def BBDown(message: Message, bot: TeleBot) -> None:  
-     """BBDown : /bbdown <bilibili URL>"""
-     url = message.text
-     print(url)
+     """BBDown : /bbdown <bilibili URL> <title>"""
+     parts = message.text.split(maxsplit=2)
+
+     url = parts[1]
+     title = parts[2]
      download_path = os.path.expanduser("~/videos")
 
      output, error = DownloadBBDVideo(url, download_path)
@@ -18,16 +20,20 @@ def BBDown(message: Message, bot: TeleBot) -> None:
         bot.reply_to(message, f"下载错误: {error}")
         return
      
-     video_folder = f"{download_path}/{GetVideoID(url)}" 
+     video_file = f"{download_path}/{title}.mp4" 
 
      try: 
-          files = os.listdir(video_folder)
-          mp4_files = [file for file in files if file.endswith(".mp4")]
-          if mp4_files:
-               for mp4_file in mp4_files:
-                    with open(os.path.join(video_folder, mp4_file), 'rb') as video_file:
-                         bot.send_video(message.chat.id, video_file)
-          asyncio.create_task(DeleteFolder(video_folder))
+          # files = os.listdir(video_folder)
+          # mp4_files = [file for file in files if file.endswith(".mp4")]
+          # if mp4_files:
+          #      for mp4_file in mp4_files:
+          #           with open(os.path.join(video_folder, mp4_file), 'rb') as video_file:
+          #                bot.send_video(message.chat.id, video_file)
+          if video_file:
+            with open(f"{download_path}/{title}.mp4", 'rb') as video_file:
+                bot.send_video(message.chat.id, video_file)
+            asyncio.create_task(DeleteFolder(video_file))
+          
      except Exception as e:
         bot.reply_to(
             message,
