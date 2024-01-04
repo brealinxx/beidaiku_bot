@@ -11,16 +11,22 @@ def BBDown(message: Message, bot: TeleBot) -> None:
      """BBDown : /bbdown <bilibili URL>"""
      url = message.text
      print(url)
+     folder = os.listdir("~/videos")
+
+     output, error = DownloadBBDVideo(url, folder)
+     if error:
+        bot.reply_to(message, f"下载错误: {error}")
+        return
+     
      video_folder = f"~/videos/{GetVideoID(url)}" 
-     files = os.listdir(video_folder)
-     mp4_files = [file for file in files if file.endswith(".mp4")]
 
      try: 
-          output, error = DownloadBBDVideo(url)
-          if output:
-            for mp4_file in mp4_files:
-                with open(os.path.join(video_folder, mp4_file), 'rb') as video_file:
-                    bot.send_video(message.chat.id, video_file)
+          files = os.listdir(video_folder)
+          mp4_files = [file for file in files if file.endswith(".mp4")]
+          if mp4_files:
+               for mp4_file in mp4_files:
+                    with open(os.path.join(video_folder, mp4_file), 'rb') as video_file:
+                         bot.send_video(message.chat.id, video_file)
           asyncio.create_task(DeleteFolder(video_folder))
      except Exception as e:
         bot.reply_to(
@@ -30,8 +36,8 @@ def BBDown(message: Message, bot: TeleBot) -> None:
      finally:
         bot.delete_message(message.chat.id, message.message_id)
 
-def DownloadBBDVideo(url):
-    process = subprocess.Popen(['BBDown', url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+def DownloadBBDVideo(url, download_path):
+    process = subprocess.Popen(['BBDown', '--work-dir', download_path, url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = process.communicate()
     if process.returncode != 0:
         return None, error.decode('utf-8')
