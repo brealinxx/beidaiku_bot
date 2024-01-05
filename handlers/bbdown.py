@@ -17,7 +17,7 @@ def BBDown(message: Message, bot: TeleBot) -> None:
      #    bot.reply_to(message, f"下载错误: {error}")
      #    return
      
-     video_file = f"{download_path}/{title}.mp4" 
+     video_file = f"{download_path}/{translate_space(title)}.mp4" 
 
      try: 
           # files = os.listdir(video_folder)
@@ -26,8 +26,8 @@ def BBDown(message: Message, bot: TeleBot) -> None:
           #      for mp4_file in mp4_files:
           #           with open(os.path.join(video_folder, mp4_file), 'rb') as video_file:
           #                bot.send_video(message.chat.id, video_file)
-          print(os.path.join(f"~/videos/{title}.mp4"))
-          j = os.path.join(f"~/videos/{title}.mp4")#download_path, f"{title}.mp4"
+          print(os.path.join(f"{video_file}"))
+          j = os.path.join(f"~/videos/{translate_space(title)}.mp4")#download_path, f"{title}.mp4"
           if os.path.exists(j):
                with open(j, 'rb') as video_file:
                     bot.send_video(message.chat.id, video_file)
@@ -80,6 +80,9 @@ def extract_url_and_title(text):
         return url, title
     else:
         return None, None
+    
+def translate_space(title):
+    return re.sub(r"\s+", r"\\", title)
 
 def register(bot: TeleBot) -> None:
     bot.register_message_handler(BBDown, commands=["bbdown"], pass_bot=True)
