@@ -10,7 +10,7 @@ import asyncio
 def BBDown(message: Message, bot: TeleBot) -> None:  
      """BBDown : /bbdown <bilibili URL> <title>"""
      url, title = extract_url_and_title(message.text)
-     download_path = os.path.expanduser("~/videos")
+     download_path = os.path.join("~/videos")
 
      # output, error = DownloadBBDVideo(url, download_path,title)
      # if error:
@@ -26,8 +26,15 @@ def BBDown(message: Message, bot: TeleBot) -> None:
           #      for mp4_file in mp4_files:
           #           with open(os.path.join(video_folder, mp4_file), 'rb') as video_file:
           #                bot.send_video(message.chat.id, video_file)
-          
-          bot.send_video(message.chat.id, os.path.join(download_path, f"{title}.mp4"))
+          print(os.path.join(f"~/videos/{title}.mp4"))
+          j = os.path.join(f"~/videos/{title}.mp4")#download_path, f"{title}.mp4"
+          if os.path.exists(j):
+               with open(j, 'rb') as video_file:
+                    bot.send_video(message.chat.id, video_file)
+          else:
+               bot.reply_to(message,'Local video not found.')
+          # file = InputMediaVideo(open(os.path.join(download_path, f"{title}.mp4"), 'rb'))
+          # bot.send_video(message.chat.id, file)
               
           #asyncio.create_task(DeleteFolder(video_file))
      except Exception as e:
