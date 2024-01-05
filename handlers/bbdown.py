@@ -12,7 +12,6 @@ tg_key = environ.get("Telegram_Bot_Token")
 
 def BBDown(message: Message, bot: TeleBot) -> None:  
      """BBDown : /bbdown <bilibili URL> <title>"""
-     print(message.chat.id)
      url, title = extract_url_and_title(message.text)
      title = title.replace(" ", "_")
      download_path = os.path.expanduser("~/videos")
@@ -33,7 +32,11 @@ def BBDown(message: Message, bot: TeleBot) -> None:
                     old_path = os.path.join(download_path, file)
                     new_path = os.path.join(download_path, new_name)
                     os.rename(old_path, new_path)
-          curl_command = [
+          
+          mp4_files = [file for file in os.listdir(download_path) if file.endswith(".mp4")]
+          for file in mp4_files:
+               video_path = os.path.join(download_path, file)
+               curl_command = [
                'curl',
                '--request', 'POST',
                '--url', f"https://api.telegram.org/bot{tg_key}/sendVideo",
@@ -43,12 +46,7 @@ def BBDown(message: Message, bot: TeleBot) -> None:
                '--form', f'caption={title}',
                '--form', 'disable_notification=false'
                ]
-
-          mp4_files = [file for file in os.listdir(download_path) if file.endswith(".mp4")]
-          for file in mp4_files:
-               video_path = os.path.join(download_path, file)
-               print(message.chat.id)
-               time.sleep(2) 
+               #time.sleep(2) 
                subprocess.run(curl_command, capture_output=True, text=True)
                asyncio.run(Deleting(video_path))
      except Exception as e:
