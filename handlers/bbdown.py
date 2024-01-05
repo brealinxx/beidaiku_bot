@@ -10,7 +10,7 @@ import asyncio
 def BBDown(message: Message, bot: TeleBot) -> None:  
      """BBDown : /bbdown <bilibili URL> <title>"""
      url, title = extract_url_and_title(message.text)
-     download_path = os.path.join("~/videos")
+     download_path = os.path.expanduser("~/videos")
 
      # output, error = DownloadBBDVideo(url, download_path,title)
      # if error:
@@ -20,19 +20,21 @@ def BBDown(message: Message, bot: TeleBot) -> None:
      video_file = f"{download_path}/{translate_space(title)}.mp4" 
 
      try: 
-          # files = os.listdir(video_folder)
-          # mp4_files = [file for file in files if file.endswith(".mp4")]
-          # if mp4_files:
-          #      for mp4_file in mp4_files:
-          #           with open(os.path.join(video_folder, mp4_file), 'rb') as video_file:
-          #                bot.send_video(message.chat.id, video_file)
-          print(os.path.join(f"{video_file}"))
-          j = os.path.join(f"~/videos/{translate_space(title)}.mp4")#download_path, f"{title}.mp4"
-          if os.path.exists(j):
-               with open(j, 'rb') as video_file:
-                    bot.send_video(message.chat.id, video_file)
-          else:
-               bot.reply_to(message,'Local video not found.')
+          files = os.listdir(download_path)
+          mp4_files = [file for file in files if file.endswith(".mp4")]
+          j = os.path.join(f"{video_file}")#download_path, f"{title}.mp4"
+          latest_video = max(mp4_files, key=os.path.getmtime)
+          if mp4_files:
+               for mp4_file in mp4_files:
+                    print(os.path.join(download_path, mp4_file))
+                    with open(os.path.join(download_path, latest_video), 'rb') as video_file:
+                         bot.send_video(message.chat.id, video_file)
+          # print(j)
+          # if os.path.exists(j):
+          #      with open(j, 'rb') as video_file:
+          #           bot.send_video(message.chat.id, video_file)
+          # else:
+          #      bot.reply_to(message,'Local video not found.')
           # file = InputMediaVideo(open(os.path.join(download_path, f"{title}.mp4"), 'rb'))
           # bot.send_video(message.chat.id, file)
               
@@ -66,10 +68,10 @@ def HexToDec(hex_str: str) -> int:
         dec_num += (16 ** (len(hex_str) - i - 1)) * ord(c) - ord('0')
     return dec_num
 
-def GetVideoID(URL):
-    BVGroup = re.search(r"BV[0-9a-zA-Z]+", URL)
-    BV = BVGroup.group()
-    return HexToDec(BV)
+# def GetVideoID(URL):
+#     BVGroup = re.search(r"BV[0-9a-zA-Z]+", URL)
+#     BV = BVGroup.group()
+#     return HexToDec(BV)
 
 def extract_url_and_title(text):
     pattern = r'(https?://\S+)\s(.+)'
