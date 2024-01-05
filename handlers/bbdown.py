@@ -82,7 +82,7 @@ def extract_url_and_title(text):
         return None, None
     
 def translate_space(title):
-    return re.sub(r"\s+", r"\\", title)
+    return re.sub(r"\s", r"\\ ", title)
 
 def register(bot: TeleBot) -> None:
     bot.register_message_handler(BBDown, commands=["bbdown"], pass_bot=True)
