@@ -8,8 +8,11 @@ import re
 import asyncio
 import time
 
+tg_key = environ.get("Telegram_Bot_Token")
+
 def BBDown(message: Message, bot: TeleBot) -> None:  
      """BBDown : /bbdown <bilibili URL> <title>"""
+     print(message.chat.id)
      url, title = extract_url_and_title(message.text)
      title = title.replace(" ", "_")
      download_path = os.path.expanduser("~/videos")
@@ -34,10 +37,10 @@ def BBDown(message: Message, bot: TeleBot) -> None:
           mp4_files = [file for file in os.listdir(download_path) if file.endswith(".mp4")]
           for file in mp4_files:
                video_path = os.path.join(download_path, file)
-               print(video_path)
+               print(message.chat.id)
                time.sleep(2) 
                bot.send_video(message.chat.id, open(video_path,4), supports_streaming=True)
-              
+               SendVideo(message.chat.id, title, video_path)
                asyncio.run(Deleting(video_path))
      except Exception as e:
         bot.reply_to(
@@ -85,6 +88,14 @@ def extract_url_and_title(text):
 # def translate_space(title):
 #     return re.sub(r"\s", r"\\ ", title)
     
+def SendVideo(chat_id, title, video_path):
+    url = f"https://api.telegram.org/bot{tg_key}/sendVideo"
+    files = {'video': open(video_path, 'rb')}
+    data = {'chat_id': chat_id}
+    response = requests.post(url, data=data, files=files)
+    caption=f'{title}' 
+    print(response.json())
+    
 def list_files_details(folder_path):
     try:
         files = os.listdir(folder_path)
@@ -93,6 +104,7 @@ def list_files_details(folder_path):
             file_path = os.path.join(folder_path, file)
             file_stat = os.stat(file_path)
             details.append({
+                
                 'name': file,
                 'size': file_stat.st_size,
                 'last_modified': file_stat.st_mtime
