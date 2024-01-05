@@ -10,6 +10,7 @@ import asyncio
 def BBDown(message: Message, bot: TeleBot) -> None:  
      """BBDown : /bbdown <bilibili URL> <title>"""
      url, title = extract_url_and_title(message.text)
+     title = title.replace(" ", "_")
      download_path = os.path.expanduser("~/videos")
 
      # output, error = DownloadBBDVideo(url, download_path,title)
@@ -17,17 +18,17 @@ def BBDown(message: Message, bot: TeleBot) -> None:
      #    bot.reply_to(message, f"下载错误: {error}")
      #    return
      
-     video_file = f"{download_path}/{translate_space(title)}.mp4" 
+     video_file = f"{download_path}/{title}.mp4" 
 
      try: 
           files = os.listdir(download_path)
           mp4_files = [file for file in files if file.endswith(".mp4")]
           latest_video = max(mp4_files, key=os.path.getmtime)
-          print(translate_space(latest_video))
+          print(latest_video)
           if mp4_files:
                for mp4_file in mp4_files:
                     print(os.path.join(download_path, mp4_file))
-                    with open(os.path.join(download_path, translate_space(latest_video)), 'rb') as video:
+                    with open(os.path.join(download_path, latest_video), 'rb') as video:
                          bot.send_video(message.chat.id, video)
           # print(j)
           # if os.path.exists(j):
