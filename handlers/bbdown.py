@@ -33,9 +33,8 @@ def BBDown(message: Message, bot: TeleBot) -> None:
           mp4_files = [file for file in os.listdir(download_path) if file.endswith(".mp4")]
           for file in mp4_files:
                video_path = os.path.join(download_path, file)
-               #with open(str(video_path), 'rb') as video:
-               print(type(video_path))
-               bot.send_video(message.chat.id, video=open(video_path))
+               print(video_path)
+               bot.send_video(message.chat.id, video=open(video_path,4))
               
           #asyncio.create_task(DeleteFolder(video_file))
      except Exception as e:
@@ -43,8 +42,8 @@ def BBDown(message: Message, bot: TeleBot) -> None:
             message,
             f"发生错误: {str(e)}"
         )
-     finally:
-        bot.delete_message(message.chat.id, message.message_id)
+     # finally:
+     #    bot.delete_message(message.chat.id, message.message_id)
 
 def DownloadBBDVideo(url, download_path,title):
     process = subprocess.Popen(['/root/DEV/BBDown', '--work-dir', download_path, url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
