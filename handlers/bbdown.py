@@ -7,7 +7,7 @@ import subprocess
 import re
 import asyncio
 
-tg_key = environ.get("Telegram_Bot_Token")
+tg_key = environ.get("TELEGRAM_BOT_TOKEN")
 
 def BBDown(message: Message, bot: TeleBot) -> None:  
      """BBDown : /bbdown <bilibili URL> <title>"""
@@ -47,16 +47,13 @@ def BBDown(message: Message, bot: TeleBot) -> None:
             #    ]
                #time.sleep(2) 
                 url = f"https://api.telegram.org/bot{tg_key}/sendVideo"
+                print(url)
                 payload = {
                     "video": f"{video_path}",
-                    "duration": None,
-                    "width": None,
-                    "height": None,
                     "caption": f"{title}",
-                    "disable_notification": False,
-                    "reply_to_message_id": None,
                     "chat_id": f"{message.chat.id}"
                 }
+                print(video_path)
                
                 headers = {
                     "accept": "application/json",
