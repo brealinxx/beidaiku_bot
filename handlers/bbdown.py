@@ -47,7 +47,7 @@ def BBDown(message: Message, bot: TeleBot) -> None:
                '--form', 'disable_notification=false'
                ]
                #time.sleep(2) 
-               subprocess.run(curl_command, capture_output=True, text=True)
+               process = subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                asyncio.run(Deleting(video_path))
      except Exception as e:
         bot.reply_to(
