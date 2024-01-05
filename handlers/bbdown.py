@@ -14,7 +14,7 @@ def BBDown(message: Message, bot: TeleBot) -> None:
      """BBDown : /bbdown <bilibili URL> <title>"""
      url, title = extract_url_and_title(message.text)
      title = title.replace(" ", "_")
-     download_path = os.path.expanduser("~/videos")
+     download_path = os.path.expanduser("/root/videos")
 
      output, error = DownloadBBDVideo(url, download_path,title)
      if error:
@@ -48,8 +48,8 @@ def BBDown(message: Message, bot: TeleBot) -> None:
                ]
                #time.sleep(2) 
                process = subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            #    if process.returncode != 0:
-            #         print(process.text)
+               if process.returncode != 0:
+                    print(process.text)
      except Exception as e:
         bot.reply_to(
             message,
