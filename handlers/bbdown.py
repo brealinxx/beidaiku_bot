@@ -22,13 +22,12 @@ def BBDown(message: Message, bot: TeleBot) -> None:
      try: 
           files = os.listdir(download_path)
           mp4_files = [file for file in files if file.endswith(".mp4")]
-          j = os.path.join(f"{video_file}")#download_path, f"{title}.mp4"
           latest_video = max(mp4_files, key=os.path.getmtime)
           if mp4_files:
                for mp4_file in mp4_files:
                     print(os.path.join(download_path, mp4_file))
-                    with open(os.path.join(download_path, latest_video), 'rb') as video_file:
-                         bot.send_video(message.chat.id, video_file)
+                    with open(os.path.join(download_path, translate_space(latest_video)), 'rb') as video:
+                         bot.send_video(message.chat.id, video)
           # print(j)
           # if os.path.exists(j):
           #      with open(j, 'rb') as video_file:
