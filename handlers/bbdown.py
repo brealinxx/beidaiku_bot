@@ -9,10 +9,8 @@ import asyncio
 
 def BBDown(message: Message, bot: TeleBot) -> None:  
      """BBDown : /bbdown <bilibili URL> <title>"""
-     parts = message.text.split(maxsplit=2)
-
-     url = parts[1]
-     title = parts[2]
+     url, title = extract_url_and_title(message.text)
+     print((url,title))
      download_path = os.path.expanduser("~/videos")
 
      output, error = DownloadBBDVideo(url, download_path)
@@ -63,6 +61,16 @@ def GetVideoID(URL):
     BVGroup = re.search(r"BV[0-9a-zA-Z]+", URL)
     BV = BVGroup.group()
     return HexToDec(BV)
+
+def extract_url_and_title(text):
+    pattern = r'(https?://\S+)\s(.+)'
+    match = re.match(pattern, text)
+    if match:
+        url = match.group(1)
+        title = match.group(2)
+        return url, title
+    else:
+        return None, None
 
 print(HexToDec("1qW411e7hV"))
 
