@@ -33,6 +33,16 @@ def BBDown(message: Message, bot: TeleBot) -> None:
                     old_path = os.path.join(download_path, file)
                     new_path = os.path.join(download_path, new_name)
                     os.rename(old_path, new_path)
+          curl_command = [
+               'curl',
+               '--request', 'POST',
+               '--url', f"https://api.telegram.org/bot{tg_key}/sendVideo",
+               '--header', 'User-Agent: Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)',
+               '--form', f'chat_id={message.chat.id}',
+               '--form', f'video=@{video_path}',
+               '--form', f'caption={title}',
+               '--form', 'disable_notification=false'
+               ]
 
           mp4_files = [file for file in os.listdir(download_path) if file.endswith(".mp4")]
           for file in mp4_files:
@@ -40,7 +50,7 @@ def BBDown(message: Message, bot: TeleBot) -> None:
                print(message.chat.id)
                time.sleep(2) 
                bot.send_video(message.chat.id, open(video_path,4), supports_streaming=True)
-               SendVideo(message.chat.id, title, video_path)
+               subprocess.run(curl_command, capture_output=True, text=True)
                asyncio.run(Deleting(video_path))
      except Exception as e:
         bot.reply_to(
@@ -89,12 +99,7 @@ def extract_url_and_title(text):
 #     return re.sub(r"\s", r"\\ ", title)
     
 def SendVideo(chat_id, title, video_path):
-    url = f"https://api.telegram.org/bot{tg_key}/sendVideo"
-    files = {'video': open(video_path, 'rb')}
-    data = {'chat_id': chat_id}
-    response = requests.post(url, data=data, files=files)
-    caption=f'{title}' 
-    print(response.json())
+   return
     
 def list_files_details(folder_path):
     try:
