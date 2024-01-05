@@ -72,8 +72,6 @@ def extract_url_and_title(text):
     else:
         return None, None
 
-print(HexToDec("1qW411e7hV"))
-
 def register(bot: TeleBot) -> None:
     bot.register_message_handler(BBDown, commands=["bbdown"], pass_bot=True)
     bot.register_message_handler(BBDown, regexp="^bbdown:", pass_bot=True)
