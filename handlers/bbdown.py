@@ -6,7 +6,6 @@ from telebot.types import Message
 import subprocess
 import re
 import asyncio
-import time
 
 tg_key = environ.get("Telegram_Bot_Token")
 
@@ -35,19 +34,32 @@ def BBDown(message: Message, bot: TeleBot) -> None:
           
           mp4_files = [file for file in os.listdir(download_path) if file.endswith(".mp4")]
           for file in mp4_files:
-               video_path = os.path.join(download_path, file)
-               curl_command = [
-               'curl',
-               '--request', 'POST',
-               '--url', f"https://api.telegram.org/bot{tg_key}/sendVideo",
-               '--header', 'User-Agent: Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)',
-               '--form', f'chat_id={message.chat.id}',
-               '--form', f'video=@{video_path}',
-               '--form', f'caption={title}',
-               '--form', 'disable_notification=false'
-               ]
+                video_path = os.path.join(download_path, file)
+            #    curl_command = [
+            #    'curl',
+            #    '--request', 'POST',
+            #    '--url', f"https://api.telegram.org/bot{tg_key}/sendVideo",
+            #    '--header', 'User-Agent: Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)',
+            #    '--form', f'chat_id={message.chat.id}',
+            #    '--form', f'video=@{video_path}',
+            #    '--form', f'caption={title}',
+            #    '--form', 'disable_notification=false'
+            #    ]
                #time.sleep(2) 
-               subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                url = f"https://api.telegram.org/bot{tg_key}/sendVideo"
+                files = {
+                    'video': open(video_path, 2)
+                }
+                data = {
+                    'chat_id': message.chat.id,
+                    'caption': title,
+                    'disable_notification': 'false'
+                }
+                headers = {
+                    'User-Agent': 'Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)'
+                }
+                response = requests.post(url, data=data, files=files, headers=headers)
+                #subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
      except Exception as e:
         bot.reply_to(
             message,
