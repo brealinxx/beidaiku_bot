@@ -38,7 +38,7 @@ def BBDown(message: Message, bot: TeleBot) -> None:
                time.sleep(2) 
                bot.send_video(message.chat.id, open(video_path,4), supports_streaming=True)
               
-               asyncio.create_task(DeleteVideoFile(video_path))
+               asyncio.run(Deleting(video_path))
      except Exception as e:
         bot.reply_to(
             message,
@@ -57,6 +57,9 @@ def DownloadBBDVideo(url, download_path,title):
 async def DeleteVideoFile(path):
     await asyncio.sleep(7200) 
     os.remove(path)
+
+async def Deleting(path):
+    asyncio.create_task(DeleteVideoFile(path))
 
 # def HexToDec(hex_str: str) -> int:
 #     dec_num = 0
