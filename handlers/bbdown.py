@@ -47,17 +47,17 @@ def BBDown(message: Message, bot: TeleBot) -> None:
                '--form', 'disable_notification=false'
                ]
                #time.sleep(2) 
-               process = subprocess.run(curl_command, capture_output=True, text=True)
+               process = subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                if process.returncode != 0:
-                    return None, error.decode('utf-8')
-               #asyncio.run(Deleting(video_path))
+                    print(process.text)
      except Exception as e:
         bot.reply_to(
             message,
             f"发生错误: {str(e)}"
         )
-     # finally:
-     #    bot.delete_message(message.chat.id, message.message_id)
+     finally:
+        bot.delete_message(message.chat.id, message.message_id)
+        asyncio.run(Deleting(video_path))
 
 def DownloadBBDVideo(url, download_path,title):
     process = subprocess.Popen(['/root/DEV/BBDown', '--work-dir', download_path, url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
