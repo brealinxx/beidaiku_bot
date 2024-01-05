@@ -49,7 +49,7 @@ def DownloadBBDVideo(url, download_path):
 
 async def DeleteFolder(path):
     await asyncio.sleep(7200) 
-    os.rmdir(path)
+    os.remove(path)
 
 def HexToDec(hex_str: str) -> int:
     dec_num = 0
