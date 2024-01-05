@@ -49,7 +49,6 @@ def BBDown(message: Message, bot: TeleBot) -> None:
                video_path = os.path.join(download_path, file)
                print(message.chat.id)
                time.sleep(2) 
-               bot.send_video(message.chat.id, open(video_path,4), supports_streaming=True)
                subprocess.run(curl_command, capture_output=True, text=True)
                asyncio.run(Deleting(video_path))
      except Exception as e:
