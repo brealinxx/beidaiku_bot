@@ -47,18 +47,24 @@ def BBDown(message: Message, bot: TeleBot) -> None:
             #    ]
                #time.sleep(2) 
                 url = f"https://api.telegram.org/bot{tg_key}/sendVideo"
-                files = {
-                    'video': open(video_path, 2)
+                payload = {
+                    "video": f"{video_path}",
+                    "duration": None,
+                    "width": None,
+                    "height": None,
+                    "caption": f"{title}",
+                    "disable_notification": False,
+                    "reply_to_message_id": None,
+                    "chat_id": f"{message.chat.id}"
                 }
-                data = {
-                    'chat_id': message.chat.id,
-                    'caption': title,
-                    'disable_notification': 'false'
-                }
+               
                 headers = {
-                    'User-Agent': 'Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)'
+                    "accept": "application/json",
+                    "User-Agent": "Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)",
+                    "content-type": "application/json"
                 }
-                response = requests.post(url, data=data, files=files, headers=headers)
+                response = requests.post(url, json=payload, headers=headers)
+                print(response.json())
                 #subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
      except Exception as e:
         bot.reply_to(
@@ -107,8 +113,8 @@ def extract_url_and_title(text):
 # def translate_space(title):
 #     return re.sub(r"\s", r"\\ ", title)
     
-def SendVideo(chat_id, title, video_path):
-   return
+# def SendVideo(chat_id, title, video_path):
+#    return
     
 def list_files_details(folder_path):
     try:
