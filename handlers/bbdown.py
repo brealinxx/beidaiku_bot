@@ -48,8 +48,6 @@ def BBDown(message: Message, bot: TeleBot) -> None:
                ]
                #time.sleep(2) 
                process = subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-               if process.returncode != 0:
-                    print(process.text)
      except Exception as e:
         bot.reply_to(
             message,
