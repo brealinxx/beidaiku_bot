@@ -6,6 +6,7 @@ from telebot.types import Message
 import subprocess
 import re
 import asyncio
+import time
 
 def BBDown(message: Message, bot: TeleBot) -> None:  
      """BBDown : /bbdown <bilibili URL> <title>"""
@@ -13,10 +14,10 @@ def BBDown(message: Message, bot: TeleBot) -> None:
      title = title.replace(" ", "_")
      download_path = os.path.expanduser("~/videos")
 
-     # output, error = DownloadBBDVideo(url, download_path,title)
-     # if error:
-     #    bot.reply_to(message, f"下载错误: {error}")
-     #    return
+     output, error = DownloadBBDVideo(url, download_path,title)
+     if error:
+        bot.reply_to(message, f"下载错误: {error}")
+        return
      
      #video_file = f"{download_path}/{title}.mp4" 
 
@@ -34,9 +35,10 @@ def BBDown(message: Message, bot: TeleBot) -> None:
           for file in mp4_files:
                video_path = os.path.join(download_path, file)
                print(video_path)
-               bot.send_video(message.chat.id, video=open(video_path,4))
+               time.sleep(2) 
+               bot.send_video(message.chat.id, open(video_path,4), supports_streaming=True)
               
-          #asyncio.create_task(DeleteFolder(video_file))
+               asyncio.create_task(DeleteVideoFile(video_path))
      except Exception as e:
         bot.reply_to(
             message,
@@ -52,7 +54,7 @@ def DownloadBBDVideo(url, download_path,title):
         return None, error.decode('utf-8')
     return output.decode('utf-8'), None
 
-async def DeleteFolder(path):
+async def DeleteVideoFile(path):
     await asyncio.sleep(7200) 
     os.remove(path)
 
