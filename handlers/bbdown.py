@@ -27,10 +27,9 @@ def BBDown(message: Message, bot: TeleBot) -> None:
           #      for mp4_file in mp4_files:
           #           with open(os.path.join(video_folder, mp4_file), 'rb') as video_file:
           #                bot.send_video(message.chat.id, video_file)
-          if video_file:
-            with open(f"{download_path}/{title}.mp4", 'rb') as video_file:
-                bot.send_video(message.chat.id, video_file)
-            asyncio.create_task(DeleteFolder(video_file))
+          with open(f"{download_path}/{title}.mp4", 'rb') as video:
+               bot.send_video(message.chat.id, video)
+          asyncio.create_task(DeleteFolder(video_file))
           
      except Exception as e:
         bot.reply_to(
