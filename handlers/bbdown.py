@@ -47,7 +47,7 @@ def BBDown(message: Message, bot: TeleBot) -> None:
                '--form', 'disable_notification=false'
                ]
                #time.sleep(2) 
-               process = subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+               subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
      except Exception as e:
         bot.reply_to(
             message,
