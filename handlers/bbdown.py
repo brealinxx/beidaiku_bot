@@ -18,9 +18,7 @@ def BBDown(message: Message, bot: TeleBot) -> None:
      output, error = DownloadBBDVideo(url, download_path,title)
      if error:
         bot.reply_to(message, f"下载错误: {error}")
-        return
-     
-     #video_file = f"{download_path}/{title}.mp4" 
+        return 
 
      try: 
           for file_info in list_files_details(download_path):
@@ -35,34 +33,17 @@ def BBDown(message: Message, bot: TeleBot) -> None:
           mp4_files = [file for file in os.listdir(download_path) if file.endswith(".mp4")]
           for file in mp4_files:
                 video_path = os.path.join(download_path, file)
-            #    curl_command = [
-            #    'curl',
-            #    '--request', 'POST',
-            #    '--url', f"https://api.telegram.org/bot{tg_key}/sendVideo",
-            #    '--header', 'User-Agent: Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)',
-            #    '--form', f'chat_id={message.chat.id}',
-            #    '--form', f'video=@{video_path}',
-            #    '--form', f'caption={title}',
-            #    '--form', 'disable_notification=false'
-            #    ]
-               #time.sleep(2) 
-                url = f"https://api.telegram.org/bot{tg_key}/sendVideo"
-                print(url)
-                payload = {
-                    "video": f"{video_path}",
-                    "caption": f"{title}",
-                    "chat_id": f"{message.chat.id}"
-                }
-                print(video_path)
-               
-                headers = {
-                    "accept": "application/json",
-                    "User-Agent": "Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)",
-                    "content-type": "application/json"
-                }
-                response = requests.post(url, json=payload, headers=headers)
-                print(response.json())
-                #subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                curl_command = [
+                'curl',
+                '-X', 'POST', f"https://api.telegram.org/bot{tg_key}/sendVideo",
+                '-H', 'User-Agent: Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)',
+                '-F', f'chat_id={message.chat.id}',
+                '-F', f'video=@{video_path}',
+                '-F', f'caption={title}',
+                '-F', 'disable_notification=false'
+                ]
+                #time.sleep(2) 
+                subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
      except Exception as e:
         bot.reply_to(
             message,

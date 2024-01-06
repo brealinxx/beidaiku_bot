@@ -80,7 +80,7 @@ function installPythonVirtualEnv(){
     echo "Python bin path: $python_bin_path"
     echo "Google_Gemini_API_Key: $Google_Gemini_API_Key"
     echo "OpenAI_GPT3.5_KEY:" $OPENAI_GPT3d5_KEY
-    echo "Telegram Bot Token: $Telegram_Bot_Token"
+    echo "Telegram Bot Token: $telegram_bot_token"
 
     # Check Virtual Environment exist
     if [ -d "$venv_dir" ]; then
