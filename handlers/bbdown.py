@@ -14,10 +14,9 @@ tg_key = environ.get("TELEGRAM_BOT_TOKEN")
 def BBDown(message: Message, bot: TeleBot) -> None:  
     """BBDown : /bbdown <bilibili URL> <title>"""
     url, title = extract_url_and_title(message.text)
-    title = title.replace(" ", "_")
     download_path = os.path.expanduser("/root/videos")
 
-    output, error = DownloadBBDVideo(url, download_path,title)
+    output, error = DownloadBBDVideo(url, download_path)
     print(output)
     if error:
         bot.reply_to(message, f"下载错误: {error}")
@@ -59,7 +58,7 @@ def BBDown(message: Message, bot: TeleBot) -> None:
         bot.delete_message(message.chat.id, message.message_id)
         monitor_folder(download_path)
 
-def DownloadBBDVideo(url, download_path,title):
+def DownloadBBDVideo(url, download_path):
     process = subprocess.Popen(['/root/DEV/BBDown', '--work-dir', download_path, url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = process.communicate()
     if process.returncode != 0:
