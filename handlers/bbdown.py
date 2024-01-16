@@ -12,48 +12,49 @@ from watchdog.events import FileSystemEventHandler
 tg_key = environ.get("TELEGRAM_BOT_TOKEN")
 
 def BBDown(message: Message, bot: TeleBot) -> None:  
-     """BBDown : /bbdown <bilibili URL> <title>"""
-     url, title = extract_url_and_title(message.text)
-     title = title.replace(" ", "_")
-     download_path = os.path.expanduser("/root/videos")
+    """BBDown : /bbdown <bilibili URL> <title>"""
+    url, title = extract_url_and_title(message.text)
+    title = title.replace(" ", "_")
+    download_path = os.path.expanduser("/root/videos")
 
-     output, error = DownloadBBDVideo(url, download_path,title)
-     if error:
+    output, error = DownloadBBDVideo(url, download_path,title)
+    print(output)
+    if error:
         bot.reply_to(message, f"下载错误: {error}")
         return 
 
-     try: 
-          for file_info in list_files_details(download_path):
-               print(f"Name: {file_info['name']}, Size: {file_info['size']} bytes, Last Modified: {file_info['last_modified']}")
-          for file in os.listdir(download_path):
-               if file.endswith(".mp4") and " " in file:
-                    new_name = file.replace(" ", "_") 
-                    old_path = os.path.join(download_path, file)
-                    new_path = os.path.join(download_path, new_name)
-                    os.rename(old_path, new_path)
-          
-          mp4_files = [file for file in os.listdir(download_path) if file.endswith(".mp4")]
-          for file in mp4_files:
-                video_path = os.path.join(download_path, file)
-                curl_command = [ #telegram doc
-                'curl',
-                '-X', 'POST', f"https://api.telegram.org/bot{tg_key}/sendVideo",
-                '-H', 'User-Agent: Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)',
-                '-F', f'chat_id={message.chat.id}',
-                '-F', f'video=@{video_path}',
-                '-F', f'caption={title}',
-                '-F', 'disable_notification=false'
-                ]
-                subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                monitor_folder(download_path)
-     except Exception as e:
+    try: 
+        for file_info in list_files_details(download_path):
+            print(f"Name: {file_info['name']}, Size: {file_info['size']} bytes, Last Modified: {file_info['last_modified']}")
+        sorted_files_info = sorted(list_files_details(download_path), key=lambda x: x["last_modified"], reverse=True)
+        for file in os.listdir(download_path):
+            if file.endswith(".mp4") and " " in file:
+                new_name = file.replace(" ", "_") 
+                old_path = os.path.join(download_path, file)
+                new_path = os.path.join(download_path, new_name)
+                os.rename(old_path, new_path)
+
+        mp4_files = [file for file in os.listdir(download_path) if file.endswith(".mp4")]
+        for file in mp4_files:
+            video_path = os.path.join(download_path, file)
+            curl_command = [ #telegram doc
+            'curl',
+            '-X', 'POST', f"https://api.telegram.org/bot{tg_key}/sendVideo",
+            '-H', 'User-Agent: Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)',
+            '-F', f'chat_id={message.chat.id}',
+            '-F', f'video=@{video_path}',
+            '-F', f'caption={title}',
+            '-F', 'disable_notification=false'
+            ]
+            subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except Exception as e:
         bot.reply_to(
             message,
             f"发生错误: {str(e)}"
         )
-     finally:
+    finally:
         bot.delete_message(message.chat.id, message.message_id)
-        asyncio.run(Deleting(video_path))
+        monitor_folder(download_path)
 
 def DownloadBBDVideo(url, download_path,title):
     process = subprocess.Popen(['/root/DEV/BBDown', '--work-dir', download_path, url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -67,7 +68,7 @@ class FileHandler(FileSystemEventHandler):
         if event.is_directory:
             return
         new_file_path = event.src_path
-        time.sleep(5)
+        time.sleep(20)
         os.remove(new_file_path)
 
 def monitor_folder(folder_path):
