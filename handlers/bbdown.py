@@ -1,4 +1,3 @@
-import requests
 import os
 from os import *
 from telebot import TeleBot
@@ -6,6 +5,9 @@ from telebot.types import Message
 import subprocess
 import re
 import asyncio
+import time
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 tg_key = environ.get("TELEGRAM_BOT_TOKEN")
 
@@ -33,7 +35,7 @@ def BBDown(message: Message, bot: TeleBot) -> None:
           mp4_files = [file for file in os.listdir(download_path) if file.endswith(".mp4")]
           for file in mp4_files:
                 video_path = os.path.join(download_path, file)
-                curl_command = [
+                curl_command = [ #telegram doc
                 'curl',
                 '-X', 'POST', f"https://api.telegram.org/bot{tg_key}/sendVideo",
                 '-H', 'User-Agent: Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)',
@@ -42,8 +44,8 @@ def BBDown(message: Message, bot: TeleBot) -> None:
                 '-F', f'caption={title}',
                 '-F', 'disable_notification=false'
                 ]
-                #time.sleep(2) 
                 subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                monitor_folder(download_path)
      except Exception as e:
         bot.reply_to(
             message,
@@ -60,12 +62,25 @@ def DownloadBBDVideo(url, download_path,title):
         return None, error.decode('utf-8')
     return output.decode('utf-8'), None
 
-async def DeleteVideoFile(path):
-    await asyncio.sleep(7200) 
-    os.remove(path)
+class FileHandler(FileSystemEventHandler):
+    def on_created(self, event):
+        if event.is_directory:
+            return
+        new_file_path = event.src_path
+        time.sleep(5)
+        os.remove(new_file_path)
 
-async def Deleting(path):
-    asyncio.create_task(DeleteVideoFile(path))
+def monitor_folder(folder_path):
+    event_handler = FileHandler()
+    observer = Observer()
+    observer.schedule(event_handler, folder_path, recursive=False)
+    observer.start()
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
 
 # def HexToDec(hex_str: str) -> int:
 #     dec_num = 0
