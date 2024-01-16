@@ -10,7 +10,6 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 tg_key = environ.get("TELEGRAM_BOT_TOKEN")
-video_path = None
 
 def BBDown(message: Message, bot: TeleBot) -> None:  
     """BBDown : /bbdown <bilibili URL> <title>"""
@@ -34,11 +33,11 @@ def BBDown(message: Message, bot: TeleBot) -> None:
         #         old_path = os.path.join(download_path, file)
         #         new_path = os.path.join(download_path, new_name)
         #         os.rename(old_path, new_path)
-        monitor_folder(download_path)
 
         mp4_files = [file for file in os.listdir(download_path) if file.endswith(".mp4")]
         for file in mp4_files:
             #video_path = os.path.join(download_path, file)
+            video_path = sorted_files_info[0]
             curl_command = [ #telegram doc
             'curl',
             '-X', 'POST', f"https://api.telegram.org/bot{tg_key}/sendVideo",
@@ -48,7 +47,9 @@ def BBDown(message: Message, bot: TeleBot) -> None:
             '-F', f'caption={title}',
             '-F', 'disable_notification=false'
             ]
+            print(message.chat.id)
             subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print(title)
     except Exception as e:
         bot.reply_to(
             message,
@@ -56,6 +57,7 @@ def BBDown(message: Message, bot: TeleBot) -> None:
         )
     finally:
         bot.delete_message(message.chat.id, message.message_id)
+        monitor_folder(download_path)
 
 def DownloadBBDVideo(url, download_path,title):
     process = subprocess.Popen(['/root/DEV/BBDown', '--work-dir', download_path, url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
