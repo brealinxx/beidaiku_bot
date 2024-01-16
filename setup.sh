@@ -123,7 +123,7 @@ Group=root
 
 Environment="OPENAI_3d5_KEY=${openAI_GPT3d5_key}"
 Environment="GOOGLE_GEMINI_KEY=${google_gemini_api_key}"
-Environment="TELEGRAM_BOT_TOKEN=${Telegram_Bot_Token}"
+Environment="TELEGRAM_BOT_TOKEN=${telegram_bot_token}"
 
 WorkingDirectory=$project_path
 ExecStart=$project_path/venv/bin/python $project_path/launch.py "${telegram_bot_token}"

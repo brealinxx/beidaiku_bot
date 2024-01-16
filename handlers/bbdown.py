@@ -46,8 +46,10 @@ def BBDown(message: Message, bot: TeleBot) -> None:
             '-F', f'caption={title}',
             '-F', 'disable_notification=false'
             ]
-            print(message.chat.id)
             subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print(tg_key)
+            print(message.chat.id)
+            print(video_path)
             print(title)
     except Exception as e:
         bot.reply_to(
