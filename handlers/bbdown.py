@@ -23,8 +23,13 @@ def BBDown(message: Message, bot: TeleBot) -> None:
 
     try: 
         for file_info in list_files_details(download_path):
-            print(f"Name: {file_info['name']}, Size: {file_info['size']} bytes, Last Modified: {file_info['last_modified']}")
+            print(f"Name: {file_info['name']}, Size: {file_info['size']} bytes, Path: {file_info['path']}, Last Modified: {file_info['last_modified']}")
         sorted_files_info = sorted(list_files_details(download_path), key=lambda x: x["last_modified"], reverse=True)
+        if sorted_files_info:
+            video_path = sorted_files_info[0]["path"]  # 获取排序后第一个文件的路径
+            print(video_path)  # 打印第一个文件的路径
+        else:
+            print("文件信息列表为空")
         # for file in os.listdir(download_path):
         #     if file.endswith(".mp4") and " " in file:
         #         new_name = file.replace(" ", "_") 
@@ -33,8 +38,6 @@ def BBDown(message: Message, bot: TeleBot) -> None:
         #         os.rename(old_path, new_path)
 
         #mp4_files = [file for file in os.listdir(download_path) if file.endswith(".mp4")]
-        video_path = sorted_files_info[0]
-        print(sorted_files_info[0])
         #video_path = os.path.join(download_path, file)
         curl_command = [ #telegram doc
         'curl',
@@ -99,6 +102,7 @@ def list_files_details(folder_path):
                 
                 'name': file,
                 'size': file_stat.st_size,
+                'path': file_path,
                 'last_modified': file_stat.st_mtime
             })
         return details
