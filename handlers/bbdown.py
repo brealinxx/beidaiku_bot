@@ -34,14 +34,14 @@ def BBDown(message: Message, bot: TeleBot) -> None:
         'curl',
         '-X', 'POST', f"https://api.telegram.org/bot{tg_key}/sendVideo",
         '-H', 'User-Agent: Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)',
-        '-F', f'chat_id={message.chat.id}',
+        '-F', f'chat_id={bot.get_chat(message.chat.id).username}',
         '-F', f'video=@{video_path}',
         '-F', f'caption={title}',
         '-F', 'disable_notification=false',
-        '-F', f'message={message.chat.id}'
+        '-F', f'reply_to_message_id={message.chat.id}'
         ]
-        subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         downloadingMeg = bot.reply_to(message, "正在下载 请稍后 QaQ")
+        subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except Exception as e:
         bot.reply_to(
             message,
@@ -50,6 +50,8 @@ def BBDown(message: Message, bot: TeleBot) -> None:
     finally:
         bot.delete_message(message.chat.id, message.message_id)
         bot.delete_message(downloadingMeg.chat.id, downloadingMeg.message_id)
+        time.sleep(10)
+        os.remove(video_path)
 
 def DownloadBBDVideo(url, download_path):
     process = subprocess.Popen(['/root/DEV/BBDown', '--work-dir', download_path, url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
