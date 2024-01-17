@@ -4,18 +4,17 @@ from telebot import TeleBot
 from telebot.types import Message
 import subprocess
 import re
-import asyncio
-import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+import time
 
 tg_key = environ.get("TELEGRAM_BOT_TOKEN")
+download_path = os.path.expanduser("/root/videos")
 
 def BBDown(message: Message, bot: TeleBot) -> None:  
     """BBDown : /bbdown <bilibili URL> <title>"""
     url, title = extract_url_and_title(message.text)
-    download_path = os.path.expanduser("/root/videos")
-
+    
     output, error = DownloadBBDVideo(url, download_path)
     print(output)
     if error:
@@ -47,10 +46,6 @@ def BBDown(message: Message, bot: TeleBot) -> None:
             '-F', 'disable_notification=false'
             ]
             subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            print(tg_key)
-            print(message.chat.id)
-            print(video_path)
-            print(title)
     except Exception as e:
         bot.reply_to(
             message,
@@ -58,7 +53,6 @@ def BBDown(message: Message, bot: TeleBot) -> None:
         )
     finally:
         bot.delete_message(message.chat.id, message.message_id)
-        monitor_folder(download_path)
 
 def DownloadBBDVideo(url, download_path):
     process = subprocess.Popen(['/root/DEV/BBDown', '--work-dir', download_path, url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -66,26 +60,6 @@ def DownloadBBDVideo(url, download_path):
     if process.returncode != 0:
         return None, error.decode('utf-8')
     return output.decode('utf-8'), None
-
-class FileHandler(FileSystemEventHandler):
-    def on_created(self, event):
-        if event.is_directory:
-            return
-        video_path = event.src_path
-        time.sleep(60)
-        os.remove(video_path)
-
-def monitor_folder(folder_path):
-    event_handler = FileHandler()
-    observer = Observer()
-    observer.schedule(event_handler, folder_path, recursive=False)
-    observer.start()
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        observer.stop()
-    observer.join()
 
 # def HexToDec(hex_str: str) -> int:
 #     dec_num = 0
@@ -131,6 +105,28 @@ def list_files_details(folder_path):
     except Exception as e:
         print(f"Error listing files: {str(e)}")
         return []
+    
+class FileHandler(FileSystemEventHandler):
+    def on_created(self, event):
+        if event.is_directory:
+            return
+        video_path = event.src_path
+        time.sleep(10)
+        os.remove(video_path)
+
+def monitor_folder(folder_path):
+    event_handler = FileHandler()
+    observer = Observer()
+    observer.schedule(event_handler, folder_path, recursive=False)
+    observer.start()
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
+
+monitor_folder(download_path)
 
 def register(bot: TeleBot) -> None:
     bot.register_message_handler(BBDown, commands=["bbdown"], pass_bot=True)
