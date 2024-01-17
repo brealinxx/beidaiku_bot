@@ -9,14 +9,13 @@ from watchdog.events import FileSystemEventHandler
 import time
 
 tg_key = environ.get("TELEGRAM_BOT_TOKEN")
-download_path = os.path.expanduser("/root/videos")
 
 def BBDown(message: Message, bot: TeleBot) -> None:  
     """BBDown : /bbdown <bilibili URL> <title>"""
+    download_path = os.path.expanduser("/root/videos")
     url, title = extract_url_and_title(message.text)
     
     output, error = DownloadBBDVideo(url, download_path)
-    print(output)
     if error:
         bot.reply_to(message, f"下载错误: {error}")
         return 
@@ -26,19 +25,11 @@ def BBDown(message: Message, bot: TeleBot) -> None:
             print(f"Name: {file_info['name']}, Size: {file_info['size']} bytes, Path: {file_info['path']}, Last Modified: {file_info['last_modified']}")
         sorted_files_info = sorted(list_files_details(download_path), key=lambda x: x["last_modified"], reverse=True)
         if sorted_files_info:
-            video_path = sorted_files_info[0]["path"]  # 获取排序后第一个文件的路径
-            print(video_path)  # 打印第一个文件的路径
+            video_path = sorted_files_info[0]["path"] 
+            print(video_path)
         else:
             print("文件信息列表为空")
-        # for file in os.listdir(download_path):
-        #     if file.endswith(".mp4") and " " in file:
-        #         new_name = file.replace(" ", "_") 
-        #         old_path = os.path.join(download_path, file)
-        #         new_path = os.path.join(download_path, new_name)
-        #         os.rename(old_path, new_path)
 
-        #mp4_files = [file for file in os.listdir(download_path) if file.endswith(".mp4")]
-        #video_path = os.path.join(download_path, file)
         curl_command = [ #telegram doc
         'curl',
         '-X', 'POST', f"https://api.telegram.org/bot{tg_key}/sendVideo",
@@ -46,9 +37,11 @@ def BBDown(message: Message, bot: TeleBot) -> None:
         '-F', f'chat_id={message.chat.id}',
         '-F', f'video=@{video_path}',
         '-F', f'caption={title}',
-        '-F', 'disable_notification=false'
+        '-F', 'disable_notification=false',
+        '-F', f'message={message.chat.id}'
         ]
         subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        downloadingMeg = bot.reply_to(message, "正在下载 请稍后 QaQ")
     except Exception as e:
         bot.reply_to(
             message,
@@ -56,6 +49,7 @@ def BBDown(message: Message, bot: TeleBot) -> None:
         )
     finally:
         bot.delete_message(message.chat.id, message.message_id)
+        bot.delete_message(downloadingMeg.chat.id, downloadingMeg.message_id)
 
 def DownloadBBDVideo(url, download_path):
     process = subprocess.Popen(['/root/DEV/BBDown', '--work-dir', download_path, url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -70,11 +64,6 @@ def DownloadBBDVideo(url, download_path):
 #         dec_num += (16 ** (len(hex_str) - i - 1)) * ord(c) - ord('0')
 #     return dec_num
 
-# def GetVideoID(URL):
-#     BVGroup = re.search(r"BV[0-9a-zA-Z]+", URL)
-#     BV = BVGroup.group()
-#     return HexToDec(BV)
-
 def extract_url_and_title(text):
     pattern = r'(https?://\S+)\s(.+)'
     match = re.match(pattern, text)
@@ -85,12 +74,6 @@ def extract_url_and_title(text):
     else:
         return None, None
     
-# def translate_space(title):
-#     return re.sub(r"\s", r"\\ ", title)
-    
-# def SendVideo(chat_id, title, video_path):
-#    return
-    
 def list_files_details(folder_path):
     try:
         files = os.listdir(folder_path)
@@ -99,7 +82,6 @@ def list_files_details(folder_path):
             file_path = os.path.join(folder_path, file)
             file_stat = os.stat(file_path)
             details.append({
-                
                 'name': file,
                 'size': file_stat.st_size,
                 'path': file_path,
@@ -109,30 +91,6 @@ def list_files_details(folder_path):
     except Exception as e:
         print(f"Error listing files: {str(e)}")
         return []
-    
-# class FileHandler(FileSystemEventHandler):
-#     def on_created(self, event):
-#         if not event.is_directory:
-#             video_path = event.src_path
-#             print(f"File created: {video_path}. Will be deleted in 60 seconds.")
-#             time.sleep(60)  # Wait for 60 seconds
-#             if os.path.exists(video_path):  # Check if file still exists
-#                 os.remove(video_path)
-#                 print(f"File deleted: {video_path}")
-
-# def monitor_folder(folder_path):
-#     event_handler = FileHandler()
-#     observer = Observer()
-#     observer.schedule(event_handler, folder_path, recursive=False)
-#     observer.start()
-#     try:
-#         while True:
-#             time.sleep(1)
-#     except KeyboardInterrupt:
-#         observer.stop()
-#     observer.join()
-
-# monitor_folder(download_path)
 
 def register(bot: TeleBot) -> None:
     bot.register_message_handler(BBDown, commands=["bbdown"], pass_bot=True)
