@@ -11,7 +11,8 @@ tg_key = environ.get("TELEGRAM_BOT_TOKEN")
 def BBDown(message: Message, bot: TeleBot) -> None:  
     """BBDown : /bbdown <bilibili URL>"""
     download_path = os.path.expanduser("/root/videos")
-    url = extract_url_and_title(message.text)
+    url = message.text.strip()
+    #url = extract_url_and_title(message.text)
     
     output, error = DownloadBBDVideo(url, download_path)
     if error:
