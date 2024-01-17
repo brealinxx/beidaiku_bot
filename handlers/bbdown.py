@@ -11,7 +11,7 @@ tg_key = environ.get("TELEGRAM_BOT_TOKEN")
 def BBDown(message: Message, bot: TeleBot) -> None:  
     """BBDown : /bbdown <bilibili URL>"""
     download_path = os.path.expanduser("/root/videos")
-    url, titleTemp = extract_url_and_title(message.text)
+    url = extract_url_and_title(message.text)
     
     output, error = DownloadBBDVideo(url, download_path)
     if error:
@@ -34,7 +34,7 @@ def BBDown(message: Message, bot: TeleBot) -> None:
         '-H', 'User-Agent: Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)',
         '-F', f'chat_id={message.chat.id}',
         '-F', f'video=@{video_path}',
-        '-F', f'caption=@{bot.get_chat(message.chat.id).username} 下载成功！\n{title}',
+        '-F', f"caption='@{bot.get_chat(message.chat.id).username}' 下载成功！\n{title}",
         '-F', 'disable_notification=false',
         ]
         downloadingMeg = bot.reply_to(message, "正在下载 请稍后 QaQ",)
@@ -45,7 +45,7 @@ def BBDown(message: Message, bot: TeleBot) -> None:
             f"发生错误: {str(e)}"
         )
     finally:
-        time.sleep(10)
+        time.sleep(60)
         os.remove(video_path)
         bot.delete_message(message.chat.id, message.message_id)
         bot.delete_message(downloadingMeg.chat.id, downloadingMeg.message_id)
@@ -64,14 +64,13 @@ def DownloadBBDVideo(url, download_path):
 #     return dec_num
 
 def extract_url_and_title(text):
-    pattern = r'(https?://\S+)\s(.+)'
+    pattern = r'https://www.bilibili.com/video/[^/?]*' #'(https?://\S+)\s(.+)'
     match = re.match(pattern, text)
     if match:
         url = match.group(1)
-        title = match.group(2)
-        return url, title
+        return url
     else:
-        return None, None
+        return None
     
 def list_files_details(folder_path):
     try:
