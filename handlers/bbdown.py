@@ -108,11 +108,13 @@ def list_files_details(folder_path):
     
 class FileHandler(FileSystemEventHandler):
     def on_created(self, event):
-        if event.is_directory:
-            return
-        video_path = event.src_path
-        time.sleep(10)
-        os.remove(video_path)
+        if not event.is_directory:
+            video_path = event.src_path
+            print(f"File created: {video_path}. Will be deleted in 60 seconds.")
+            time.sleep(60)  # Wait for 60 seconds
+            if os.path.exists(video_path):  # Check if file still exists
+                os.remove(video_path)
+                print(f"File deleted: {video_path}")
 
 def monitor_folder(folder_path):
     event_handler = FileHandler()
