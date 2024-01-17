@@ -32,20 +32,20 @@ def BBDown(message: Message, bot: TeleBot) -> None:
         #         new_path = os.path.join(download_path, new_name)
         #         os.rename(old_path, new_path)
 
-        mp4_files = [file for file in os.listdir(download_path) if file.endswith(".mp4")]
-        for file in mp4_files:
-            #video_path = os.path.join(download_path, file)
-            video_path = sorted_files_info[0]
-            curl_command = [ #telegram doc
-            'curl',
-            '-X', 'POST', f"https://api.telegram.org/bot{tg_key}/sendVideo",
-            '-H', 'User-Agent: Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)',
-            '-F', f'chat_id={message.chat.id}',
-            '-F', f'video=@{video_path}',
-            '-F', f'caption={title}',
-            '-F', 'disable_notification=false'
-            ]
-            subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        #mp4_files = [file for file in os.listdir(download_path) if file.endswith(".mp4")]
+        video_path = sorted_files_info[0]
+        print(sorted_files_info[0])
+        #video_path = os.path.join(download_path, file)
+        curl_command = [ #telegram doc
+        'curl',
+        '-X', 'POST', f"https://api.telegram.org/bot{tg_key}/sendVideo",
+        '-H', 'User-Agent: Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)',
+        '-F', f'chat_id={message.chat.id}',
+        '-F', f'video=@{video_path}',
+        '-F', f'caption={title}',
+        '-F', 'disable_notification=false'
+        ]
+        subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except Exception as e:
         bot.reply_to(
             message,
@@ -106,29 +106,29 @@ def list_files_details(folder_path):
         print(f"Error listing files: {str(e)}")
         return []
     
-class FileHandler(FileSystemEventHandler):
-    def on_created(self, event):
-        if not event.is_directory:
-            video_path = event.src_path
-            print(f"File created: {video_path}. Will be deleted in 60 seconds.")
-            time.sleep(60)  # Wait for 60 seconds
-            if os.path.exists(video_path):  # Check if file still exists
-                os.remove(video_path)
-                print(f"File deleted: {video_path}")
+# class FileHandler(FileSystemEventHandler):
+#     def on_created(self, event):
+#         if not event.is_directory:
+#             video_path = event.src_path
+#             print(f"File created: {video_path}. Will be deleted in 60 seconds.")
+#             time.sleep(60)  # Wait for 60 seconds
+#             if os.path.exists(video_path):  # Check if file still exists
+#                 os.remove(video_path)
+#                 print(f"File deleted: {video_path}")
 
-def monitor_folder(folder_path):
-    event_handler = FileHandler()
-    observer = Observer()
-    observer.schedule(event_handler, folder_path, recursive=False)
-    observer.start()
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        observer.stop()
-    observer.join()
+# def monitor_folder(folder_path):
+#     event_handler = FileHandler()
+#     observer = Observer()
+#     observer.schedule(event_handler, folder_path, recursive=False)
+#     observer.start()
+#     try:
+#         while True:
+#             time.sleep(1)
+#     except KeyboardInterrupt:
+#         observer.stop()
+#     observer.join()
 
-monitor_folder(download_path)
+# monitor_folder(download_path)
 
 def register(bot: TeleBot) -> None:
     bot.register_message_handler(BBDown, commands=["bbdown"], pass_bot=True)
