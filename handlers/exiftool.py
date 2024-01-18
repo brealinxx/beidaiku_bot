@@ -11,11 +11,11 @@ def Exif(message: Message, bot: TeleBot) -> None:
  
      try:
           max_size_photo = max(message.photo, key=lambda p: p.file_size)
-          file_path = bot.get_file(max_size_photo.file_id).file_path
+          file_path = bot.get_file(message.photo.file_id).file_path
           downloaded_file = bot.download_file(file_path)
-          with open("photo_temp.jpg", "wb") as temp_file:
+          with open(f"root/videos/{downloaded_file}", "wb") as temp_file:
                temp_file.write(downloaded_file)
-          image_path = Path("photo_temp.jpg")
+          image_path = Path(downloaded_file)
           image_data = image_path.read_bytes()
 
           photo_data_process = subprocess.Popen(['exiftool', image_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)

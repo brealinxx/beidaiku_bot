@@ -10,6 +10,10 @@ openAI_GPT3d5_key="${OPENAI_GPT3d5_KEY}"
 google_gemini_api_key="${Google_Gemini_API_Key}"
 telegram_bot_token="${Telegram_Bot_Token}"
 
+if [ ! -d "/root/media" ]; then
+    mkdir /root/media
+fi
+
 sudoCmd=""
 if [[ $(/usr/bin/id -u) -ne 0 ]]; then
   sudoCmd="sudo"
