@@ -7,16 +7,11 @@ import tempfile
 
 def Exif(message: Message, bot: TeleBot) -> None:
      """exiftool : /exif <photo>"""
-     print("1")
      print(message.photo[0])
      max_size_photo = max(message.photo, key=lambda p: p.file_size)
-     print("2")
-     file_info = bot.get_file(message.photo.file_id)
-     print("3")
+     file_info = bot.get_file(max_size_photo.file_id)
      file_path = file_info.file_path
-     print("4")
      downloaded_file = bot.download_file(file_path)
-     print("5")
 
      _, file_ext = os.path.splitext(file_path)
      print(file_ext)
@@ -26,6 +21,7 @@ def Exif(message: Message, bot: TeleBot) -> None:
 
      photo_data_process = subprocess.Popen(['exiftool', temp_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
      stdout, stderr = photo_data_process.communicate()
+
      try:
           bot.reply_to(message, f"照片信息:\n {stdout.decode('utf-8')}")
 
@@ -36,16 +32,17 @@ def Exif(message: Message, bot: TeleBot) -> None:
           if os.path.exists(temp_file_path):
                os.remove(temp_file_path)
 
+# def clean_sensitive_data(exif_data):
+#     lines = exif_data.split('\n')
+#     sensitive_fields = ['GPS', 'Create Date', 'Date/Time Original', 'Modify Date']
+#     cleaned_lines = [line for line in lines if not any(field in line for field in sensitive_fields)]
+
+#     return '\n'.join(cleaned_lines)
+
 def register(bot: TeleBot) -> None:
      bot.register_message_handler(
           Exif,
           content_types=["photo"],
-          commands=["exif"],
-          pass_bot=True
-     )
-     bot.register_message_handler(
-          Exif,
-          content_types=["photo"],
-          regexp="^exif",
+          func=lambda m: m.caption and m.caption.startswith(("exif:", "/exif")),
           pass_bot=True
      )
