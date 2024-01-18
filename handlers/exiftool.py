@@ -9,8 +9,6 @@ from pathlib import Path
 def Exif(message: Message, bot: TeleBot) -> None:  
      """exiftool : /exif <photo>"""
  
-     downloadingMeg = bot.reply_to(message, "正在下载 请稍候 QaQ",)
-     subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
      try:
           max_size_photo = max(message.photo, key=lambda p: p.file_size)
           file_path = bot.get_file(max_size_photo.file_id).file_path
@@ -20,8 +18,13 @@ def Exif(message: Message, bot: TeleBot) -> None:
           image_path = Path("photo_temp.jpg")
           image_data = image_path.read_bytes()
 
-          photo_data = subprocess.Popen(['exiftool', image_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-          print(photo_data)
+          photo_data_process = subprocess.Popen(['exiftool', image_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+          stdout, stderr = photo_data_process.communicate()
+        
+          bot.reply_to(
+               message,
+               f"照片信息:\n {stdout.decode('utf-8')}"
+          )
      except Exception as e:
           bot.reply_to(
                message,
