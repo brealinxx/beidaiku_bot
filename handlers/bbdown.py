@@ -38,7 +38,7 @@ def BBDown(message: Message, bot: TeleBot) -> None:
         '-F', f"caption='@{bot.get_chat(message.chat.id).username}' 下载成功！\n{title}",
         '-F', 'disable_notification=false',
         ]
-        downloadingMeg = bot.reply_to(message, "正在下载 请稍后 QaQ",)
+        downloadingMeg = bot.reply_to(message, "正在下载 请稍候 QaQ",)
         subprocess.Popen(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except Exception as e:
         bot.reply_to(
