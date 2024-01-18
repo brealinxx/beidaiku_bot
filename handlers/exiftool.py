@@ -8,9 +8,10 @@ import tempfile
 def Exif(message: Message, bot: TeleBot) -> None:
      """exiftool : /exif <photo>"""
      print("1")
+     print(message.photo[0])
      max_size_photo = max(message.photo, key=lambda p: p.file_size)
      print("2")
-     file_info = bot.get_file(max_size_photo.file_id)
+     file_info = bot.get_file(message.photo.file_id)
      print("3")
      file_path = file_info.file_path
      print("4")
@@ -36,5 +37,15 @@ def Exif(message: Message, bot: TeleBot) -> None:
                os.remove(temp_file_path)
 
 def register(bot: TeleBot) -> None:
-    bot.register_message_handler(Exif, commands=["exif"], pass_bot=True)
-    bot.register_message_handler(Exif, regexp="^exif:", pass_bot=True)
+     bot.register_message_handler(
+          Exif,
+          content_types=["photo"],
+          commands=["exif"],
+          pass_bot=True
+     )
+     bot.register_message_handler(
+          Exif,
+          content_types=["photo"],
+          regexp="^exif",
+          pass_bot=True
+     )
