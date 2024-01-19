@@ -9,7 +9,7 @@ cmds = []
 helpTrigger = None
 
 def Exif(message: Message, bot: TeleBot) -> None:
-     """exiftool : /exif --help <photo>"""
+     """exiftool : /exif [help] or <photoFile>"""
      s = message.caption
      extraCmd = s.strip()
      file_info = bot.get_file(message.document.file_id)
@@ -20,20 +20,8 @@ def Exif(message: Message, bot: TeleBot) -> None:
      with tempfile.NamedTemporaryFile(dir="/root/media", delete=False, suffix=file_ext) as temp_file:
           temp_file.write(downloaded_file)
           temp_file_path = temp_file.name
-     
-     if extraCmd == "clean": 
-          subprocess.Popen(['exiftool','-alldates=', '-gps:all=', temp_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-          file_data_process = subprocess.Popen(['exiftool', temp_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-     elif extraCmd:
-          for cmd in cmds:
-               subprocess.Popen(['exiftool',cmd, temp_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-          file_data_process = subprocess.Popen(['exiftool', temp_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-     else:
-          file_data_process = subprocess.Popen(['exiftool', temp_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-     stdout, stderr = file_data_process.communicate()
-
-     send_telegram_message(bot, message, stdout, temp_file_path)
+     send_telegram_message(bot, message, get_stdout(bot, message, extraCmd, temp_file_path), temp_file_path)
 
 def ExifHelp(message: Message, bot: TeleBot) -> None:
      '''exiftool: help'''
@@ -73,6 +61,23 @@ def send_telegram_message(bot, message, stdout, tempFilePath):
           finally:
                if os.path.exists(tempFilePath):
                     os.remove(tempFilePath)
+
+def get_stdout(bot, message, extraCmd, tempFilePath):
+     try:
+          if extraCmd == "clean":
+               clean_process = subprocess.Popen(['exiftool','-alldates=', '-gps:all=', tempFilePath, '&&', 'exiftool', tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+               stdout, stderr = clean_process.communicate()
+          elif extraCmd:
+               for cmd in cmds:
+                    reWrite_process = subprocess.Popen(['exiftool', cmd, tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+               stdout, stderr = reWrite_process.communicate()
+          else:
+               file_data_process = subprocess.Popen(['exiftool', tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+               stdout, stderr = file_data_process.communicate()
+     except Exception as e:
+          bot.reply_to(message, f"发生错误: {str(e)}")
+
+     return stdout
                     
 def output_result(message):
      return f"<span class=\"tg-spoiler\">照片信息：\n{message.decode('utf-8')}</span>"
