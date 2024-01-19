@@ -22,7 +22,7 @@ def Exif(message: Message, bot: TeleBot) -> None:
           temp_file.write(downloaded_file)
           temp_file_path = temp_file.name
      
-     extraCmdList(extraCmd)
+     #extraCmdList(extraCmd)
      send_telegram_message(bot, message, get_stdout(bot, message, extraCmd, temp_file_path), temp_file_path)
 
 def ExifHelp(message: Message, bot: TeleBot) -> None:
@@ -50,17 +50,17 @@ def get_stdout(bot, message, extraCmd, tempFilePath):
             stdout, stderr = file_data_process.communicate()
             if file_data_process.returncode != 0:
                 print(f"Error in file data reading process: {stderr}")
-        elif extraCmd:
-            for cmd in cmds:
-               print(cmd)
-               cmd = extraCmd.split()
-               reWrite_process = subprocess.Popen(['exiftool', *cmd, tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-               stdout, stderr = reWrite_process.communicate()
-               if reWrite_process.returncode != 0:
-                    print(f"Error in rewrite process: {stderr}")
-                    return stdout
+     #    elif extraCmd:
+     #        for cmd in cmds:
+     #           print(cmd)
+     #           cmd = extraCmd.split()
+     #           reWrite_process = subprocess.Popen(['exiftool', *cmd, tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+     #           stdout, stderr = reWrite_process.communicate()
+     #           if reWrite_process.returncode != 0:
+     #                print(f"Error in rewrite process: {stderr}")
+     #                return stdout
 
-            send_cleaned_file(bot, message, tempFilePath)  
+     #        send_cleaned_file(bot, message, tempFilePath)  
         else:
             file_data_process = subprocess.Popen(['exiftool', '-a', '-u', '-g1', tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = file_data_process.communicate()
