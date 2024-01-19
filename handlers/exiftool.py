@@ -2,11 +2,17 @@ import os
 from telebot import TeleBot
 from telebot.types import Message
 import subprocess
-from pathlib import Path
 import tempfile
 import re
 
 cmds = []
+
+def ExifHelp(message: Message, bot: TeleBot) -> None:
+     s = message.caption
+     extraCmd = s.strip()
+     if extraCmd == "help":
+          bot.reply_to(message, f"EXIF 是Exchangeable Image File 的缩写，这是一种用于使用 JPEG 压缩在数字摄影图像文件中存储交换信息的标准格式。几乎所有新型数码相机都使用 EXIF 注释，存储有关图像的信息，如快门速度、曝光补偿、光圈值、所使用的测光系统、是否使用了闪光灯、ISO 编号、拍摄日期和时间、白平衡以及所使用的辅助镜头和分辨率。有些图像甚至也会存储 GPS 信息。")
+          return
 
 def Exif(message: Message, bot: TeleBot) -> None:
      """exiftool : /exif --help <photo>"""
@@ -17,10 +23,6 @@ def Exif(message: Message, bot: TeleBot) -> None:
      file_path = file_info.file_path
      downloaded_file = bot.download_file(file_path)
 
-     if extraCmd == "help":
-          bot.reply_to(message, f"EXIF 是Exchangeable Image File 的缩写，这是一种用于使用 JPEG 压缩在数字摄影图像文件中存储交换信息的标准格式。几乎所有新型数码相机都使用 EXIF 注释，存储有关图像的信息，如快门速度、曝光补偿、光圈值、所使用的测光系统、是否使用了闪光灯、ISO 编号、拍摄日期和时间、白平衡以及所使用的辅助镜头和分辨率。有些图像甚至也会存储 GPS 信息。")
-          return
-     
      _, file_ext = os.path.splitext(file_path)
      with tempfile.NamedTemporaryFile(dir="/root/media", delete=False, suffix=file_ext) as temp_file:
           temp_file.write(downloaded_file)
@@ -55,11 +57,11 @@ def extraCmdList(exif_data):
 
 
 def register(bot: TeleBot) -> None:
-     bot.register_message_handler(Exif, commands=["exif"], pass_bot=True)
-     bot.register_message_handler(Exif, regexp="^exif:", pass_bot=True)
+     bot.register_message_handler(ExifHelp, commands=["exif"], pass_bot=True)
+     bot.register_message_handler(ExifHelp, regexp="^exif:", pass_bot=True)
      bot.register_message_handler(
           Exif,
-          content_types=["photo"],
+          content_types=["file"],
           func=lambda m: m.caption and m.caption.startswith(("exif:", "/exif")),
           pass_bot=True
      )
