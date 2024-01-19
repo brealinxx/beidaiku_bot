@@ -6,13 +6,19 @@ import tempfile
 import re
 
 cmds = []
+helpTrigger = None
 
 def ExifHelp(message: Message, bot: TeleBot) -> None:
+     '''exiftool: help'''
      s = message.caption
      extraCmd = s.strip()
-     if extraCmd == "help":
-          bot.reply_to(message, f"EXIF 是Exchangeable Image File 的缩写，这是一种用于使用 JPEG 压缩在数字摄影图像文件中存储交换信息的标准格式。几乎所有新型数码相机都使用 EXIF 注释，存储有关图像的信息，如快门速度、曝光补偿、光圈值、所使用的测光系统、是否使用了闪光灯、ISO 编号、拍摄日期和时间、白平衡以及所使用的辅助镜头和分辨率。有些图像甚至也会存储 GPS 信息。")
-          return
+     try:
+          if extraCmd == "help":
+               helpTrigger = True
+               bot.reply_to(message, f"EXIF 是Exchangeable Image File 的缩写，这是一种用于使用 JPEG 压缩在数字摄影图像文件中存储交换信息的标准格式。几乎所有新型数码相机都使用 EXIF 注释，存储有关图像的信息，如快门速度、曝光补偿、光圈值、所使用的测光系统、是否使用了闪光灯、ISO 编号、拍摄日期和时间、白平衡以及所使用的辅助镜头和分辨率。有些图像甚至也会存储 GPS 信息。")
+     except Exception as e:
+          bot.reply_to(message, f"发生错误: {str(e)}")
+          
 
 def Exif(message: Message, bot: TeleBot) -> None:
      """exiftool : /exif --help <photo>"""
@@ -59,9 +65,10 @@ def extraCmdList(exif_data):
 def register(bot: TeleBot) -> None:
      bot.register_message_handler(ExifHelp, commands=["exif"], pass_bot=True)
      bot.register_message_handler(ExifHelp, regexp="^exif:", pass_bot=True)
-     bot.register_message_handler(
-          Exif,
-          content_types=["file"],
-          func=lambda m: m.caption and m.caption.startswith(("exif:", "/exif")),
-          pass_bot=True
-     )
+     if not helpTrigger:
+          bot.register_message_handler(
+               Exif,
+               content_types=["document","photo"],
+               func=lambda m: m.caption and m.caption.startswith(("exif:", "/exif")),
+               pass_bot=True
+          )
