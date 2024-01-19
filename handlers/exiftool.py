@@ -8,18 +8,6 @@ import re
 cmds = []
 helpTrigger = None
 
-def ExifHelp(message: Message, bot: TeleBot) -> None:
-     '''exiftool: help'''
-     extraCmd = message.text.strip()
-     try:
-          if extraCmd == "help":
-               helpTrigger = True
-               bot.reply_to(message, f"EXIF 是Exchangeable Image File 的缩写，这是一种用于使用 JPEG 压缩在数字摄影图像文件中存储交换信息的标准格式。几乎所有新型数码相机都使用 EXIF 注释，存储有关图像的信息，如快门速度、曝光补偿、光圈值、所使用的测光系统、是否使用了闪光灯、ISO 编号、拍摄日期和时间、白平衡以及所使用的辅助镜头和分辨率。有些图像甚至也会存储 GPS 信息。"+ 
-                            "\n本功能上传的图片需要以「file」的形式上传")
-     except Exception as e:
-          bot.reply_to(message, f"发生错误: {str(e)}")
-          
-
 def Exif(message: Message, bot: TeleBot) -> None:
      """exiftool : /exif --help <photo>"""
      s = message.caption
@@ -32,9 +20,10 @@ def Exif(message: Message, bot: TeleBot) -> None:
      with tempfile.NamedTemporaryFile(dir="/root/media", delete=False, suffix=file_ext) as temp_file:
           temp_file.write(downloaded_file)
           temp_file_path = temp_file.name
-     print(temp_file_path)
+     
      if extraCmd == "clean": 
-          file_data_process = subprocess.Popen(['exiftool','-alldates=', '-gps:all=', temp_file_path, '&&', 'exiftool', 'temp_file_path'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+          subprocess.Popen(['exiftool','-alldates=', '-gps:all=', temp_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+          file_data_process = subprocess.Popen(['exiftool', temp_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
      elif extraCmd:
           for cmd in cmds:
                subprocess.Popen(['exiftool',cmd, temp_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -45,6 +34,16 @@ def Exif(message: Message, bot: TeleBot) -> None:
      stdout, stderr = file_data_process.communicate()
 
      send_telegram_message(bot, message, stdout, temp_file_path)
+
+def ExifHelp(message: Message, bot: TeleBot) -> None:
+     extraCmd = message.text.strip()
+     try:
+          if extraCmd == "help":
+               helpTrigger = True
+               bot.reply_to(message, f"EXIF 是Exchangeable Image File 的缩写，这是一种用于使用 JPEG 压缩在数字摄影图像文件中存储交换信息的标准格式。几乎所有新型数码相机都使用 EXIF 注释，存储有关图像的信息，如快门速度、曝光补偿、光圈值、所使用的测光系统、是否使用了闪光灯、ISO 编号、拍摄日期和时间、白平衡以及所使用的辅助镜头和分辨率。有些图像甚至也会存储 GPS 信息。"+ 
+                            "\n本功能上传的图片需要以「file」的形式上传")
+     except Exception as e:
+          bot.reply_to(message, f"发生错误: {str(e)}")
 
 def extraCmdList(exif_data):
      pattern = re.compile(r'^-(.*?)=\s(.*?)$')
