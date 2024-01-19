@@ -20,7 +20,8 @@ def Exif(message: Message, bot: TeleBot) -> None:
      with tempfile.NamedTemporaryFile(dir="/root/media", delete=False, suffix=file_ext) as temp_file:
           temp_file.write(downloaded_file)
           temp_file_path = temp_file.name
-
+     
+     extraCmdList(extraCmd)
      send_telegram_message(bot, message, get_stdout(bot, message, extraCmd, temp_file_path), temp_file_path)
 
 def ExifHelp(message: Message, bot: TeleBot) -> None:
@@ -93,6 +94,14 @@ def send_cleaned_file(bot, message, filePath):
             bot.send_document(message.chat.id, file)
     except Exception as e:
         bot.reply_to(message, f"发送清理后的文件时发生错误: {str(e)}")
+
+def extraCmdList(exif_data):
+     pattern = re.compile(r'^-(.*?)=\s(.*?)$')
+     match = pattern.finditer('-Make= -CAM= -Model= -hh=')
+
+     for m in match:
+          print(m.group(0))
+          cmds.append(m.group(0))
                 
 def output_result(message):
      return f"<span class=\"tg-spoiler\">照片信息：\n{message.decode('utf-8')}</span>"
