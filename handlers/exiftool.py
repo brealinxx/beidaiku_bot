@@ -36,6 +36,7 @@ def Exif(message: Message, bot: TeleBot) -> None:
      send_telegram_message(bot, message, stdout, temp_file_path)
 
 def ExifHelp(message: Message, bot: TeleBot) -> None:
+     '''exiftool: help'''
      extraCmd = message.text.strip()
      try:
           if extraCmd == "help":
