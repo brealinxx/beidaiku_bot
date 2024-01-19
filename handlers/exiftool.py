@@ -34,13 +34,38 @@ def ExifHelp(message: Message, bot: TeleBot) -> None:
      except Exception as e:
           bot.reply_to(message, f"发生错误: {str(e)}")
 
-def extraCmdList(exif_data):
-     pattern = re.compile(r'^-(.*?)=\s(.*?)$')
-     match = pattern.finditer('-Make= -CAM= -Model= -hh=')
+def get_stdout(bot, message, extraCmd, tempFilePath):
+    try:
+        if extraCmd == "clean":
+            clean_process = subprocess.Popen(['exiftool','-alldates=', '-gps:all=', tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = clean_process.communicate()
+            if clean_process.returncode != 0:
+                print(f"Error in cleaning process: {stderr}")
+                return stdout
 
-     for m in match:
-          print(m.group(0))
-          cmds.append(m.group(0))
+            send_cleaned_file(bot, message, tempFilePath)
+            file_data_process = subprocess.Popen(['exiftool', '-a', '-u', '-g1', tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = file_data_process.communicate()
+            if file_data_process.returncode != 0:
+                print(f"Error in file data reading process: {stderr}")
+        elif extraCmd:
+            for cmd in cmds:
+                reWrite_process = subprocess.Popen(['exiftool', cmd, tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stdout, stderr = reWrite_process.communicate()
+                if reWrite_process.returncode != 0:
+                    print(f"Error in rewrite process: {stderr}")
+                    return stdout
+        else:
+            file_data_process = subprocess.Popen(['exiftool', '-a', '-u', '-g1', tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = file_data_process.communicate()
+            if file_data_process.returncode != 0:
+                print(f"Error in file data process: {stderr}")
+
+    except Exception as e:
+        bot.reply_to(message, f"发生错误: {str(e)}")
+        return None
+
+    return stdout
 
 def send_telegram_message(bot, message, stdout, tempFilePath):
      if len(stdout) <= 4096:
@@ -62,38 +87,13 @@ def send_telegram_message(bot, message, stdout, tempFilePath):
                if os.path.exists(tempFilePath):
                     os.remove(tempFilePath)
 
-def get_stdout(bot, message, extraCmd, tempFilePath):
+def send_cleaned_file(bot, message, filePath):
     try:
-        if extraCmd == "clean":
-            clean_process = subprocess.Popen(['exiftool','-alldates=', '-gps:all=', tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            stdout, stderr = clean_process.communicate()
-            if clean_process.returncode != 0:
-                print(f"Error in cleaning process: {stderr}")
-                return stdout
-
-            file_data_process = subprocess.Popen(['exiftool', tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            stdout, stderr = file_data_process.communicate()
-            if file_data_process.returncode != 0:
-                print(f"Error in file data reading process: {stderr}")
-        elif extraCmd:
-            for cmd in cmds:
-                reWrite_process = subprocess.Popen(['exiftool', cmd, tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                stdout, stderr = reWrite_process.communicate()
-                if reWrite_process.returncode != 0:
-                    print(f"Error in rewrite process: {stderr}")
-                    return stdout
-        else:
-            file_data_process = subprocess.Popen(['exiftool', tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            stdout, stderr = file_data_process.communicate()
-            if file_data_process.returncode != 0:
-                print(f"Error in file data process: {stderr}")
-
+        with open(filePath, 'rb') as file:
+            bot.send_document(message.chat.id, file)
     except Exception as e:
-        bot.reply_to(message, f"发生错误: {str(e)}")
-        return None
-
-    return stdout
-                    
+        bot.reply_to(message, f"发送清理后的文件时发生错误: {str(e)}")
+                
 def output_result(message):
      return f"<span class=\"tg-spoiler\">照片信息：\n{message.decode('utf-8')}</span>"
 
