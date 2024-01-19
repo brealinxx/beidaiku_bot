@@ -10,8 +10,7 @@ helpTrigger = None
 
 def ExifHelp(message: Message, bot: TeleBot) -> None:
      '''exiftool: help'''
-     s = message.caption
-     extraCmd = s.strip()
+     extraCmd = message.text.strip()
      try:
           if extraCmd == "help":
                helpTrigger = True
@@ -24,8 +23,8 @@ def Exif(message: Message, bot: TeleBot) -> None:
      """exiftool : /exif --help <photo>"""
      s = message.caption
      extraCmd = s.strip()
-     max_size_photo = max(message.photo, key=lambda p: p.file_size)
-     file_info = bot.get_file(max_size_photo.file_id)
+     max_size_photo = max(message.document, key=lambda p: p.file_size)
+     file_info = bot.get_file(message.document.file_id)
      file_path = file_info.file_path
      downloaded_file = bot.download_file(file_path)
 
@@ -43,15 +42,7 @@ def Exif(message: Message, bot: TeleBot) -> None:
 
      stdout, stderr = photo_data_process.communicate()
 
-     try:
-          bot.reply_to(message, f"照片信息:\n {stdout.decode('utf-8')}")
-
-     except Exception as e:
-          bot.reply_to(message, f"发生错误: {str(e)}")
-
-     finally:
-          if os.path.exists(temp_file_path):
-               os.remove(temp_file_path)
+     send_telegram_message(bot, message, stdout, temp_file_path)
 
 def extraCmdList(exif_data):
      pattern = re.compile(r'^-(.*?)=\s(.*?)$')
@@ -60,6 +51,26 @@ def extraCmdList(exif_data):
      for m in match:
           print(m.group(0))
           cmds.append(m.group(0))
+
+def send_telegram_message(bot, message, stdout, tempFilePath):
+    if len(stdout) <= 4096:
+          try:
+               bot.reply_to(message, f"照片信息:\n {stdout.decode('utf-8')}")
+          except Exception as e:
+               bot.reply_to(message, f"发生错误: {str(e)}")
+          finally:
+               if os.path.exists(tempFilePath):
+                    os.remove(tempFilePath)
+    else:
+        chunks = [stdout[i:i+4000] for i in range(0, len(stdout), 4000)]
+        for chunk in chunks:
+          try:
+               bot.reply_to(message, f"照片信息:\n {chunk.decode('utf-8')}")
+          except Exception as e:
+               bot.reply_to(message, f"发生错误: {str(e)}")
+          finally:
+               if os.path.exists(tempFilePath):
+                    os.remove(tempFilePath)
 
 
 def register(bot: TeleBot) -> None:
