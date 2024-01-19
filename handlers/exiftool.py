@@ -51,6 +51,7 @@ def get_stdout(bot, message, extraCmd, tempFilePath):
                 print(f"Error in file data reading process: {stderr}")
         elif extraCmd:
             for cmd in cmds:
+                print(cmd)
                 reWrite_process = subprocess.Popen(['exiftool', cmd, tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = reWrite_process.communicate()
                 if reWrite_process.returncode != 0:
@@ -97,7 +98,7 @@ def send_cleaned_file(bot, message, filePath):
 
 def extraCmdList(exif_data):
      pattern = re.compile(r'^-(.*?)=\s(.*?)$')
-     match = pattern.finditer('-Make= -CAM= -Model= -hh=')
+     match = pattern.finditer(exif_data)
 
      for m in match:
           print(m.group(0))
