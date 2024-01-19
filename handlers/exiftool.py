@@ -7,7 +7,6 @@ import re
 
 cmds = []
 helpTrigger = None
-transTrigger = None
 
 def ExifHelp(message: Message, bot: TeleBot) -> None:
      '''exiftool: help'''
@@ -35,11 +34,11 @@ def Exif(message: Message, bot: TeleBot) -> None:
           temp_file_path = temp_file.name
      print(temp_file_path)
      if extraCmd == "clean": 
-          transTrigger = True
-          file_data_process = subprocess.Popen(['exiftool','-alldates=', '-gps:all=', temp_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+          file_data_process = subprocess.Popen(['exiftool','-alldates=', '-gps:all=', temp_file_path, '&&', 'exiftool', 'temp_file_path'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
      elif extraCmd:
-          transTrigger = True
-          file_data_process = subprocess.Popen(['exiftool',cmds, temp_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+          for cmd in cmds:
+               subprocess.Popen(['exiftool',cmd, temp_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+          file_data_process = subprocess.Popen(['exiftool', temp_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
      else:
           file_data_process = subprocess.Popen(['exiftool', temp_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -72,9 +71,6 @@ def send_telegram_message(bot, message, stdout, tempFilePath):
           except Exception as e:
                bot.reply_to(message, f"发生错误: {str(e)}")
           finally:
-               if not transTrigger:
-                    send_telegram_message(bot, message, stdout, tempFilePath)
-                    transTrigger = False
                if os.path.exists(tempFilePath):
                     os.remove(tempFilePath)
                     
