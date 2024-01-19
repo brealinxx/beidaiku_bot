@@ -45,18 +45,20 @@ def get_stdout(bot, message, extraCmd, tempFilePath):
                 return stdout
 
             send_cleaned_file(bot, message, tempFilePath)
-            file_data_process = subprocess.Popen(['exiftool', '-a', '-u', '-g1', tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            stdout, stderr = file_data_process.communicate()
-            if file_data_process.returncode != 0:
-                print(f"Error in file data reading process: {stderr}")
+          #   file_data_process = subprocess.Popen(['exiftool', '-a', '-u', '-g1', tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+          #   stdout, stderr = file_data_process.communicate()
+          #   if file_data_process.returncode != 0:
+          #       print(f"Error in file data reading process: {stderr}")
         elif extraCmd:
             for cmd in cmds:
-                print(cmd)
-                reWrite_process = subprocess.Popen(['exiftool', cmd, tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                stdout, stderr = reWrite_process.communicate()
-                if reWrite_process.returncode != 0:
+               cmd = extraCmd.split()
+               reWrite_process = subprocess.Popen(['exiftool', *cmd, tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+               stdout, stderr = reWrite_process.communicate()
+               if reWrite_process.returncode != 0:
                     print(f"Error in rewrite process: {stderr}")
                     return stdout
+
+            send_cleaned_file(bot, message, tempFilePath)  
         else:
             file_data_process = subprocess.Popen(['exiftool', '-a', '-u', '-g1', tempFilePath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = file_data_process.communicate()
