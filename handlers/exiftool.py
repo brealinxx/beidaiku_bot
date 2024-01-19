@@ -56,10 +56,9 @@ def extraCmdList(exif_data):
           cmds.append(m.group(0))
 
 def send_telegram_message(bot, message, stdout, tempFilePath):
-     output = f"<span class=\"tg-spoiler\">照片信息：\n{stdout.decode('utf-8')}</span>"
      if len(stdout) <= 4096:
           try:
-               bot.reply_to(message, text=output, parse_mode="HTML")
+               bot.reply_to(message, text=output_result(stdout), parse_mode="HTML")
           except Exception as e:
                bot.reply_to(message, f"发生错误: {str(e)}")
           finally:
@@ -69,7 +68,7 @@ def send_telegram_message(bot, message, stdout, tempFilePath):
         chunks = [stdout[i:i+4000] for i in range(0, len(stdout), 4000)]
         for chunk in chunks:
           try:
-               bot.reply_to(message, text=output, parse_mode="HTML")
+               bot.reply_to(message, text=output_result(chunk), parse_mode="HTML")
           except Exception as e:
                bot.reply_to(message, f"发生错误: {str(e)}")
           finally:
@@ -79,6 +78,8 @@ def send_telegram_message(bot, message, stdout, tempFilePath):
                if os.path.exists(tempFilePath):
                     os.remove(tempFilePath)
                     
+def output_result(message):
+     return f"<span class=\"tg-spoiler\">照片信息：\n{message.decode('utf-8')}</span>"
 
 def register(bot: TeleBot) -> None:
      bot.register_message_handler(ExifHelp, commands=["exif"], pass_bot=True)
