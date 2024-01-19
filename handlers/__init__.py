@@ -53,7 +53,7 @@ def wrap_handler(handler: T, bot: TeleBot) -> T:
             return handler(message, *args, **kwargs)
         except Exception:
             traceback.print_exc()
-            bot.reply_to(message, "Something wrong, please check the log")
+            bot.reply_to(message, "Something wrong, please check your input")
 
     return update_wrapper(wrapper, handler)
 
