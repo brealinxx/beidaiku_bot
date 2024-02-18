@@ -32,11 +32,7 @@ def ExifHelp(message: Message, bot: TeleBot) -> None:
      try:
           if extraCmd == "help":
                helpTrigger = True
-               bot.reply_to(message, 
-                            "*EXIF 是 Exchangeable Image File 的缩写，这是一种用于使用 JPEG 压缩在数字摄影图像文件中存储交换信息的标准格式。几乎所有新型数码相机都使用 EXIF 注释，存储有关图像的信息，如快门速度、曝光补偿、光圈值、所使用的测光系统、是否使用了闪光灯、ISO 编号、拍摄日期和时间、白平衡以及所使用的辅助镜头和分辨率。有些图像甚至也会存储 GPS 信息.*\n\n" +
-                            "*本功能上传的图片或者音视频等需要以「file」的形式上传*\n" + 
-                            "*可以使用的命令:\\n /exif  <上传你的file> \\n /exif clean <上传你的file>\\n /exif <exif tag>= <上传你的file> (该命令是清除指定的信息，将exif tag换成你想要删除的信息(tag的输入不要带空格，例如 A B，输入时是 /exif AB；部分tag无法修改)，每个命令以空格结尾并区分*",
-                            parse_mode='MarkdownV2')
+               bot.reply_to(message, "\\*EXIF 是 Exchangeable Image File 的缩写，这是一种用于使用 JPEG 压缩在数字摄影图像文件中存储交换信息的标准格式。几乎所有新型数码相机都使用 EXIF 注释，存储有关图像的信息，如快门速度、曝光补偿、光圈值、所使用的测光系统、是否使用了闪光灯、ISO 编号、拍摄日期和时间、白平衡以及所使用的辅助镜头和分辨率。有些图像甚至也会存储 GPS 信息。*\\n\\n" + "\\*本功能上传的图片或者音视频等需要以「file」的形式上传*\\n" + "\\*可以使用的命令:\\n /exif <上传你的file> \\n /exif clean <上传你的file>\\n /exif <exif tag>= <上传你的file> (该命令是清除指定的信息，将exif tag换成你想要删除的信息(tag的输入不要带空格，例如 A B，输入时是 /exif AB；部分tag无法修改)，每个命令以空格结尾并区分*\\", parse_mode='MarkdownV2')
                
      except Exception as e:
           bot.reply_to(message, f"发生错误: {str(e)}")
