@@ -29,13 +29,12 @@ def Exif(message: Message, bot: TeleBot) -> None:
 def ExifHelp(message: Message, bot: TeleBot) -> None:
      '''exiftool: help'''
      extraCmd = message.text.strip()
+     text = "EXIF 是Exchangeable Image File 的缩写，这是一种用于使用 JPEG 压缩在数字摄影图像文件中存储交换信息的标准格式。几乎所有新型数码相机都使用 EXIF 注释，存储有关图像的信息，如快门速度、曝光补偿、光圈值、所使用的测光系统、是否使用了闪光灯、ISO 编号、拍摄日期和时间、白平衡以及所使用的辅助镜头和分辨率。有些图像甚至也会存储 GPS 信息。"+ "\n" +"本功能上传的图片或者音视频等需要以「file」的形式上传" + "可以使用的命令:\n /exif  <上传你的file> \n /exif clean <上传你的file>\n /exif <exif tag>= <上传你的file> (该命令是清除指定的信息，将exif tag换成你想要删除的信息(tag的输入不要带空格，例如 A B，输入时是 /exif AB；部分tag无法修改)，每个命令以<b>空格结尾<b>并区分)"
      try:
           if extraCmd == "help":
                helpTrigger = True
-               bot.reply_to(message, f"<p>EXIF 是Exchangeable Image File 的缩写，这是一种用于使用 JPEG 压缩在数字摄影图像文件中存储交换信息的标准格式。几乎所有新型数码相机都使用 EXIF 注释，存储有关图像的信息，如快门速度、曝光补偿、光圈值、所使用的测光系统、是否使用了闪光灯、ISO 编号、拍摄日期和时间、白平衡以及所使用的辅助镜头和分辨率。有些图像甚至也会存储 GPS 信息。</p>"+ "<p></p>" +
-                            "<p>本功能上传的图片或者音视频等需要以「file」的形式上传</p>" + 
-                            "<p>可以使用的命令:\n /exif  <上传你的file> \n /exif clean <上传你的file>\n /exif <exif tag>= <上传你的file> (该命令是清除指定的信息，将exif tag换成你想要删除的信息(tag的输入不要带空格，例如 A B，输入时是 /exif AB；部分tag无法修改)，每个命令以<b>空格结尾<b>并区分)</p>",
-                            parse_mode='HTML',)
+               bot.reply_to(message, markdownv2_escape(text),
+                            parse_mode='MarkdownV2',)
                
      except Exception as e:
           bot.reply_to(message, f"发生错误: {str(e)}")
@@ -110,8 +109,21 @@ def extraCmdList(exif_data):
           print(m.group(0))
           cmds.append(m.group(0))
 
-def output_result(message, extraText):
-     return f"<span class=\"tg-spoiler\">{extraText}照片信息：\n{message.decode('utf-8')}</span>"
+def output_result(message):
+     return f"<span class=\"tg-spoiler\">照片信息：\n{message.decode('utf-8')}</span>"
+
+def markdownv2_escape(text):
+     """
+     对 MarkdownV2 文本进行转义。
+     """
+
+     text = re.sub(r'\\', r'\\\\', text)
+
+     for char in r'_, *[]()~`>#+=-|{}.!':
+          text = text.replace(char, r'\%s' % char)
+
+     return text
+
 
 def register(bot: TeleBot) -> None:
      if not helpTrigger:
