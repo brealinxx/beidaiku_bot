@@ -110,8 +110,8 @@ def extraCmdList(exif_data):
           print(m.group(0))
           cmds.append(m.group(0))
 
-def output_result(message, extraText):
-     return f"<span class=\"tg-spoiler\">{extraText}照片信息：\n{message.decode('utf-8')}</span>"
+def output_result(message):
+     return f"<span class=\"tg-spoiler\">照片信息：\n{message.decode('utf-8')}</span>"
 
 def register(bot: TeleBot) -> None:
      if not helpTrigger:
